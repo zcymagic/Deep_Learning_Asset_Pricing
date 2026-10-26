@@ -108,8 +108,23 @@ Auditing the oracle SDF (which prices both factors) gives:
 * **power caveat for the paper:** a failure that occurs in about 20% of months, with about 30 such
   months in the hold-out, sits near the multiple-testing bar. Report power curves.
 
-Pipeline output on the synthetic panel: `results/paper1_synthetic/REPORT.md` (regenerate with the
-commands below).
+Full pipeline on the synthetic panel (snapshot in `docs/synthetic_validation/paper1_REPORT.md`; train 300 /
+valid 100 / test 200 months, N = 1000):
+* **Ladder.** Test Sharpe ratios (monthly) are 0.76 linear, 0.77 additive, 0.80 additive + state + pairs,
+  and only 0.43 for the neural SDF. The neural net overfits: train 0.80, valid 0.27. Its portfolio has no
+  significant alpha on any glass-box rung (|t| < 0.8), so in this economy the price of interpretability
+  is *negative*. Pair screening picked the LME × Spread interaction, which is the planted mispricing
+  region. On real data the size of this gap is the headline number.
+* **Audit.** The oracle SDF and the neural SDF both fail only on the limits-to-arbitrage region (hold-out
+  t = 9–11). The trained glass-box SDFs load on that region, so they price it and no rule is
+  confirmed against them. The linear SDF, which cannot express the region, fails on it and on a
+  state-dependent momentum rule.
+* **Caveats to address in the paper:**
+  1. the momentum × VIX failure is missed with a 300-month discovery window. That is a power issue,
+     so report power curves and a pooled-sample discovery as robustness;
+  2. the state-dependence test is run for each rule at a Bonferroni bound over the state variables,
+     and one of 4 non-state rules crossed it (ip_growth, t = 2.8). Use a stricter bound, or a
+     multiple-testing correction across rules × states, when classifying.
 
 ## 4. Empirical design on real data
 
@@ -164,7 +179,7 @@ SDF on the full panel.
 ## 6. Next steps checklist
 
 - [ ] Download CPZ data; run `--list_macro`; set `state_vars` / `audit_state_vars` in `config_glassbox/cpz.json`
-- [ ] Export factor returns (FF5, q5) aligned to the panel dates; add a `factor_files` loader in `run_paper1.py`
+- [ ] Export factor returns (FF5 + UMD, q5) to `datasets/factors/*.csv` with a `date` column matching the npz dates (loader: `factor_files` in `config_glassbox/cpz.json`)
 - [ ] Run the ladder with `n_seeds: 9` (CPZ ensemble convention)
 - [ ] Run the audit for all SDFs; write the failure-map figure
 - [ ] Extend the data to 2024 for a true out-of-sample test

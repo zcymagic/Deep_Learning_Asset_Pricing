@@ -75,8 +75,15 @@ Two complementary notions are reported:
      pricing signal. All ambiguity regressions therefore control for the reference SDF weight and its
      absolute value. Without these controls, synthetic data with no planted effect showed a spurious
      ambiguity "premium" (t = 3.9);
-  2. state-varying shapes extrapolate in extreme states, so the monthly index co-moves with |s_t|.
-     Report the index both raw and residualized on the state variables.
+  2. ambiguity is also high for *extreme characteristics*, so with linear characteristic controls it
+     absorbs nonlinear characteristic premia. Even with the weight controls, the no-effect synthetic panel
+     still gave t = 3.6. Adding squared characteristics (now the default) brings it to −0.2. On real
+     data, also try decile-dummy controls and the glass-box shape features themselves;
+  3. state-varying shapes extrapolate in extreme states, so the monthly index co-moves with |s_t|
+     (correlation ≈ 0.57 with VIX and with the credit spread in synthetic data). Report the index both
+     raw and residualized on the state variables.
+
+Full pipeline snapshot: `docs/synthetic_validation/paper2_REPORT.md` and `paper2_shape_bands.png`.
 
 ## 4. Empirical design on real data
 

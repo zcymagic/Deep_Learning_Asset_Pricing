@@ -135,7 +135,7 @@ def main():
 			f.write('## Identification: %s\n\n' % label + md_table(tab, 3) + '\n\n')
 		f.write('## SDF ambiguity\n\nShare of stock-months whose SDF weight sign is not identified (eps=%s): %s\n\n' % (E.eps, sign_share))
 		f.write('### Hold-out sorts on ambiguity\n\n' + md_table(sorts.reset_index().rename(columns={'index': 'portfolio'})) + '\n\n')
-		f.write('### Hold-out Fama-MacBeth: returns on standardized ambiguity, reference SDF weight, |weight| and characteristics\n\n' + md_table(fm.reset_index().rename(columns={'index': 'variable'})) + '\n\n')
+		f.write('### Hold-out Fama-MacBeth: returns on standardized ambiguity, reference SDF weight, |weight|, characteristics and their squares\n\n' + md_table(fm.reset_index().rename(columns={'index': 'variable'})) + '\n\n')
 		for key, t in extra_fm.items():
 			f.write('### Hold-out Fama-MacBeth: %s on ambiguity\n\n' % key + md_table(t.reset_index().rename(columns={'index': 'variable'})) + '\n\n')
 		f.write('### Monthly ambiguity index vs macro series\n\n' + md_table(idx_macro) + '\n\n')

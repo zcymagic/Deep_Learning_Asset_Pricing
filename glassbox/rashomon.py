@@ -405,21 +405,29 @@ def _standardize_cs(x, mask):
 	return out
 
 
-def ambiguity_regressions(panel, A, controls=None, outcome=None, extra_controls=None):
+def ambiguity_regressions(panel, A, controls=None, outcome=None, extra_controls=None, squares=True):
 	"""Fama-MacBeth of returns (default) or of panel.extra[outcome] on standardized ambiguity.
 
 	controls: characteristic names (default: all). extra_controls: {name: T x N array}, e.g. the reference
 	SDF weight and its absolute value -- ambiguity is largest where weights are extreme, so without them
-	ambiguity can proxy for the model's own pricing signal. All regressors are standardized each month.
+	ambiguity can proxy for the model's own pricing signal. squares=True adds squared characteristics:
+	ambiguity is high for extreme characteristics, so with linear controls only it picks up nonlinear
+	characteristic premia (synthetic data with no planted effect: t = 3.6 linear, -0.2 with squares).
+	The ambiguity and extra regressors are standardized each month.
 	"""
 	controls = panel.char_names if controls is None else controls
 	cols, names = [_standardize_cs(A, panel.mask)], ['ambiguity']
 	for name, x in (extra_controls or {}).items():
 		cols.append(_standardize_cs(x, panel.mask))
 		names.append(name)
-	X = np.concatenate([np.stack(cols, axis=2), panel.Z[:, :, [panel.char_idx(c) for c in controls]]], axis=2)
+	Zc = panel.Z[:, :, [panel.char_idx(c) for c in controls]]
+	blocks, cnames = [np.stack(cols, axis=2), Zc], names + list(controls)
+	if squares:
+		blocks.append(Zc ** 2)
+		cnames += [c + '^2' for c in controls]
+	X = np.concatenate(blocks, axis=2)
 	y = panel.R if outcome is None else panel.extra[outcome]
-	return fama_macbeth(y, X, panel.mask, names + list(controls))
+	return fama_macbeth(y, X, panel.mask, cnames)
 
 
 def ambiguity_index_regressions(panel, index):
