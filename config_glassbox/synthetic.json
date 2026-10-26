@@ -1,0 +1,22 @@
+{
+	"_comment": "Synthetic panel with planted ground truth (scripts/make_synthetic.py). Same keys as config/config.json.",
+	"individual_feature_file": "datasets/synthetic/Char_train.npz",
+	"individual_feature_file_valid": "datasets/synthetic/Char_valid.npz",
+	"individual_feature_file_test": "datasets/synthetic/Char_test.npz",
+	"macro_feature_file": "datasets/synthetic/macro_train.npz",
+	"macro_feature_file_valid": "datasets/synthetic/macro_valid.npz",
+	"macro_feature_file_test": "datasets/synthetic/macro_test.npz",
+	"macro_idx": null,
+
+	"state_vars": ["credit_spread", "vix"],
+	"audit_state_vars": ["credit_spread", "term_spread", "vix", "inflation", "unemployment", "ip_growth"],
+	"lta_chars": ["LME", "Spread", "IdioVol", "LTurnover"],
+	"value_group": ["BEME", "CF2P"],
+
+	"train": {"epochs_unc": 1000, "epochs_moment": 200, "epochs_cond": 1000, "lr": 0.003, "eval_every": 20},
+	"ladder": {"n_seeds": 1, "n_pairs": 3, "neural_hidden": [32, 32]},
+	"audit": {"beam": 30, "top": 10, "n_boot": 500, "min_stocks": 20},
+	"rashomon": {"rung": "additive_state", "eps_grid": [0.002, 0.01, 0.05], "n_boot": 200, "lam_smooth": 0.001},
+
+	"external_sdfs": {"oracle": {"path": "datasets/synthetic/M_oracle.npy", "kind": "M"}}
+}

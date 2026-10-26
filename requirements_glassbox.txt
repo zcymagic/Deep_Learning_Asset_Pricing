@@ -1,0 +1,7 @@
+# glass-box SDF / auditor / Rashomon code (glassbox/, scripts/run_paper*.py); the original TF 1.12 code keeps requirements.txt
+torch>=2.0
+numpy>=1.24
+pandas>=2.0
+scipy>=1.10
+matplotlib>=3.7
+pytest>=7
