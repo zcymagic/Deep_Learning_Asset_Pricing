@@ -20,6 +20,10 @@
 
 	"_external_comment": "kind F = SDF portfolio return (M = 1 - F), kind M = SDF; series cover train+valid+test in order. The notebook saves the CPZ GAN ensemble as sdf_normalized_ensemble.npy.",
 	"external_sdfs": {"cpz_gan_ensemble": {"path": "sample_checkpoints/sdf_normalized_ensemble.npy", "kind": "F"}},
-	"_factor_comment": "Traded factor SDFs to audit: CSV with a date column (YYYYMMDD ints matching the npz dates) and excess-return factor columns, e.g. Ken French FF5 + UMD; b is estimated on the training split.",
-	"factor_files": {"ff5_umd": {"path": "datasets/factors/ff5_umd.csv", "date_col": "date", "columns": ["Mkt-RF", "SMB", "HML", "RMW", "CMA", "UMD"]}}
+	"_factor_comment": "Traded factor SDFs to audit, b estimated on the training split. Create the CSV with scripts/download_ff_factors.py (Ken French library, aligned to the npz dates).",
+	"factor_files": {
+		"capm": {"path": "datasets/factors/ff5_umd.csv", "date_col": "date", "columns": ["Mkt-RF"]},
+		"ff3": {"path": "datasets/factors/ff5_umd.csv", "date_col": "date", "columns": ["Mkt-RF", "SMB", "HML"]},
+		"ff5_umd": {"path": "datasets/factors/ff5_umd.csv", "date_col": "date", "columns": ["Mkt-RF", "SMB", "HML", "RMW", "CMA", "UMD"]}
+	}
 }
