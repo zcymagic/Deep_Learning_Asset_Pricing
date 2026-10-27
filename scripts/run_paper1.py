@@ -85,6 +85,7 @@ def main():
 	ap.add_argument('--out', required=True)
 	ap.add_argument('--list_macro', action='store_true')
 	ap.add_argument('--skip_neural', action='store_true')
+	ap.add_argument('--reuse', default=None, help='output dir of an earlier run: reload its fitted rungs, fit only the missing ones')
 	args = ap.parse_args()
 	torch.set_num_threads(max(1, os.cpu_count() or 1))
 	cfg = load_config(args.config)
@@ -106,8 +107,22 @@ def main():
 	for r in rungs:
 		if r['type'] == 'neural':
 			r['hidden'] = cfg.get('ladder', {}).get('neural_hidden', [64, 64])
+	prefitted = {}
+	if args.reuse:
+		old = pd.read_csv(os.path.join(args.reuse, 'ladder.csv'))
+		for r in rungs:
+			path = os.path.join(args.reuse, 'model_%s.pt' % r['name'])
+			if not os.path.exists(path):
+				continue
+			pairs = None
+			row = old[old['model'] == r['name']]
+			if 'pairs' in old and len(row) and isinstance(row['pairs'].iloc[0], str):
+				pairs = [tuple(train.char_idx(c.strip()) for c in p.split(' x ')) for p in row['pairs'].iloc[0].split(', ')]
+			prefitted[r['name']] = {'states': torch.load(path), 'pairs': pairs}
+		print('[ladder] reusing', sorted(prefitted))
 	ladder_df, fitted, _ = run_ladder(train, valid, test, state_vars, rungs, tcfg,
-		n_seeds=cfg.get('ladder', {}).get('n_seeds', 1), n_pairs=cfg.get('ladder', {}).get('n_pairs', 5))
+		n_seeds=cfg.get('ladder', {}).get('n_seeds', 1), n_pairs=cfg.get('ladder', {}).get('n_pairs', 5),
+		prefitted=prefitted)
 	ladder_df.to_csv(os.path.join(args.out, 'ladder.csv'), index=False)
 
 	# 2. exact read-outs of the richest glass-box rung
