@@ -144,7 +144,7 @@ def main():
 		f.write('### Hold-out Fama-MacBeth: returns on standardized ambiguity, reference SDF weight, |weight|, characteristics and their squares\n\n' + md_table(fm.reset_index().rename(columns={'index': 'variable'})) + '\n\n')
 		for key, t in extra_fm.items():
 			f.write('### Hold-out Fama-MacBeth: %s on ambiguity\n\n' % key + md_table(t.reset_index().rename(columns={'index': 'variable'})) + '\n\n')
-		f.write('### Monthly ambiguity index vs macro series\n\n' + md_table(idx_macro) + '\n\n')
+		f.write('### Monthly ambiguity index vs macro series (top 15 by |corr|; all in ambiguity_index_vs_macro.csv)\n\n' + md_table(idx_macro.head(15)) + '\n\n')
 		f.write('## Sharpe ratio across the Rashomon set (test, raw SDF portfolio)\n\n' + md_table(sr) + '\n')
 	print('wrote', args.out)
 
