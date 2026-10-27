@@ -165,7 +165,7 @@ class RashomonEllipsoid:
 				thetas.append(torch.linalg.solve(Ab + ridge_I, bb).numpy())
 			self.boot_thetas = np.array(thetas)
 			d = self.boot_thetas - self.theta
-			self.boot_dist = np.einsum('bd,de,be->b', d, self.A, d)
+			self.boot_dist = ((d @ self.A) * d).sum(1)
 		if eps is None:
 			self.r2 = float(np.quantile(self.boot_dist, level))
 			self.eps = self.r2 / J_star
@@ -265,7 +265,7 @@ class RashomonEllipsoid:
 			if method == 'bootstrap':
 				# percentile interval: importance is a non-negative quadratic, the pivotal one can go negative
 				ref = self.theta @ G @ self.theta
-				vb = np.einsum('bd,de,be->b', self.boot_thetas, G, self.boot_thetas)
+				vb = ((self.boot_thetas @ G) * self.boot_thetas).sum(1)
 				a = alpha / len(items)
 				lo, hi = np.quantile(vb, [a / 2, 1 - a / 2])
 			else:
@@ -339,7 +339,7 @@ class RashomonEllipsoid:
 				m = batch['mask'][t].numpy()
 				ph = self.model.features(batch, t).double().numpy()
 				w = ph @ self.theta
-				half = np.sqrt(self.r2 * np.einsum('nd,de,ne->n', ph, self.Ainv, ph))
+				half = np.sqrt(self.r2 * ((ph @ self.Ainv) * ph).sum(1))
 				A[t, m] = half / max(w.std(), 1e-12)
 				sign_amb[t, m] = np.abs(w) < half
 		return A, sign_amb, np.nanmean(A, axis=1)
