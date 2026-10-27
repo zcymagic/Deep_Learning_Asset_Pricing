@@ -1,5 +1,5 @@
 {
-	"_comment": "Chen-Pelger-Zhu data (download per README into datasets/). state_vars must be names from the macro file; run scripts/run_paper1.py --list_macro to print them. The FRED-MD mnemonics below are suggestions to replace with the names in your file.",
+	"_comment": "Chen-Pelger-Zhu data (download per README into datasets/). state_vars must be names from the macro file; run scripts/run_paper1.py --list_macro to print them. State variable names below are checked against the CPZ macro file (FRED-MD mnemonics plus Welch-Goyal series such as svar, dfy, tms).",
 	"individual_feature_file": "datasets/char/Char_train.npz",
 	"individual_feature_file_valid": "datasets/char/Char_valid.npz",
 	"individual_feature_file_test": "datasets/char/Char_test.npz",
@@ -9,7 +9,7 @@
 	"macro_idx": null,
 
 	"state_vars": ["BAAFFM", "T10YFFM", "VXOCLSx"],
-	"audit_state_vars": ["BAAFFM", "T10YFFM", "VXOCLSx", "UNRATE", "CPIAUCSL", "INDPRO", "S&P div yield", "NFCI"],
+	"audit_state_vars": ["BAAFFM", "T10YFFM", "VXOCLSx", "UNRATE", "CPIAUCSL", "INDPRO", "S&P div yield", "svar"],
 	"lta_chars": ["LME", "Spread", "IdioVol", "Resid_Var", "LTurnover", "SUV", "Variance", "Rel2High", "AT"],
 	"value_group": ["BEME", "A2ME", "C", "CF", "CF2P", "D2P", "E2P", "Q", "S2P"],
 
