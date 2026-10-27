@@ -93,6 +93,26 @@ def quadratic_objective(model, batch, h=None, weighted=True, time_weights=None):
 	return A + penalty_matrix(model), bv, c0
 
 
+def select_shrinkage(model, batch_tr, h, batch_va, grid=(0.0, 1e-4, 1e-3, 1e-2, 1e-1, 1.0), weighted=True,
+		ridge=1e-8):
+	"""Pick the L2 shrinkage of the closed-form SDF by validation Sharpe ratio of F = 1 - M = Psi theta.
+
+	Returns (best shrink, DataFrame with train / valid Sharpe ratios for every value).
+	"""
+	A, bv, _ = quadratic_objective(model, batch_tr, h, weighted)
+	D = A.shape[0]
+	scale = torch.trace(A) / D
+	Psi_tr = model._cached_design(batch_tr).double()
+	Psi_va = model._cached_design(batch_va).double()
+	rows = []
+	for lam in grid:
+		th = torch.linalg.solve(A + (ridge + lam) * scale * torch.eye(D, dtype=torch.float64), bv)
+		f_tr, f_va = (Psi_tr @ th).numpy(), (Psi_va @ th).numpy()
+		rows.append({'shrink': lam, 'sharpe_train': f_tr.mean() / f_tr.std(), 'sharpe_valid': f_va.mean() / f_va.std()})
+	df = pd.DataFrame(rows)
+	return float(df.loc[df['sharpe_valid'].idxmax(), 'shrink']), df
+
+
 # ------------------------------------------------------------------------------------------------
 # trust-region subproblem: extremes of a quadratic over the unit ball
 # ------------------------------------------------------------------------------------------------
@@ -135,17 +155,22 @@ def _trs_max(Mq, c, tol=1e-12):
 # ------------------------------------------------------------------------------------------------
 class RashomonEllipsoid:
 	def __init__(self, model, batch, h=None, eps=0.01, level=0.95, n_boot=200, mean_block=6, seed=0,
-			ridge=1e-8, weighted=True):
+			ridge=1e-8, shrink=0.0, weighted=True):
 		"""Closed-form refit of `model` on (batch, h) and the Rashomon ellipsoid around it.
 
 		eps given: relative tolerance, r^2 = eps J*. eps None: simultaneous bootstrap calibration at `level`.
 		n_boot > 0 also stores bootstrap refits for the marginal (method='bootstrap') tables.
 		The model's parameters are overwritten with theta*. ridge (relative to the mean diagonal) only
 		regularizes directions that do not move any weight (e.g. the level of a centered shape function).
+		shrink adds an L2 penalty shrink * mean-diag(A) * |theta|^2 to the objective (a shrinkage SDF in
+		the spirit of Kozak-Nagel-Santosh). With hundreds of parameters the unpenalized optimum overfits
+		badly (CPZ panel, additive_state: train Sharpe 4.2, test ~0), so choose it with select_shrinkage.
+		The objective stays quadratic, so every exact bound below still holds for the penalized J.
 		"""
 		A, bv, c0 = quadratic_objective(model, batch, h, weighted)
 		D = A.shape[0]
-		ridge_I = ridge * torch.trace(A) / D * torch.eye(D, dtype=torch.float64)
+		ridge_I = (ridge + shrink) * torch.trace(A) / D * torch.eye(D, dtype=torch.float64)
+		self.shrink = shrink
 		A = A + ridge_I
 		theta = torch.linalg.solve(A, bv)
 		J_star = float(c0 - bv @ theta)

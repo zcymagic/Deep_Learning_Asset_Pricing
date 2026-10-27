@@ -26,7 +26,7 @@ from glassbox.adversary import NeuralAdversary
 from glassbox.data import concat_time, load_config, load_splits
 from glassbox.interpret import plot_shapes
 from glassbox.rashomon import (RashomonEllipsoid, ambiguity_index_regressions, ambiguity_regressions,
-	ambiguity_sorts)
+	ambiguity_sorts, select_shrinkage)
 from glassbox.report import md_table
 from glassbox.sdf import build_sdf
 from glassbox.train import TrainConfig, evaluate, fit_gan
@@ -42,6 +42,7 @@ def main():
 	ap = argparse.ArgumentParser()
 	ap.add_argument('--config', required=True)
 	ap.add_argument('--out', required=True)
+	ap.add_argument('--rung', default=None, help='override rashomon.rung from the config')
 	args = ap.parse_args()
 	torch.set_num_threads(max(1, os.cpu_count() or 1))
 	cfg = load_config(args.config)
@@ -53,7 +54,8 @@ def main():
 	groups = {'value': [c for c in cfg.get('value_group', []) if c in names]} if cfg.get('value_group') else None
 
 	# 1. fit
-	spec = dict(RUNG_SPECS[rc.get('rung', 'additive_state')])
+	rung = args.rung or rc.get('rung', 'additive_state')
+	spec = dict(RUNG_SPECS[rung])
 	spec.update({'lam_group': 0.0, 'lam_smooth': rc.get('lam_smooth', 1e-3), 'n_knots': rc.get('n_knots', 9)})
 	K, P, Md = train.K, len(state_vars), len(train.macro_names)
 	b_tr, b_va, b_te = [p.to_torch(state_vars) for p in (train, valid, test)]
@@ -66,7 +68,10 @@ def main():
 		h = adv(b_tr)
 
 	# 2. ellipsoid (closed-form refit) + bootstrap
-	E = RashomonEllipsoid(model, b_tr, h, eps=rc.get('eps_grid', [0.01])[0], n_boot=rc.get('n_boot', 200))
+	shrink, shrink_df = select_shrinkage(model, b_tr, h, b_va, grid=rc.get('shrink_grid', (0.0, 1e-4, 1e-3, 1e-2, 1e-1, 1.0)))
+	shrink_df.to_csv(os.path.join(args.out, 'shrinkage_selection.csv'), index=False)
+	print('[rashomon] shrinkage selected on validation: %g' % shrink)
+	E = RashomonEllipsoid(model, b_tr, h, eps=rc.get('eps_grid', [0.01])[0], n_boot=rc.get('n_boot', 200), shrink=shrink)
 	perf = pd.DataFrame([{**{'split': s}, **{k: v for k, v in evaluate(model, b).items() if k in ('sharpe', 'sharpe_raw', 'ev', 'xs_r2')}}
 		for s, b in (('train', b_tr), ('valid', b_va), ('test', b_te))])
 	perf.to_csv(os.path.join(args.out, 'reference_performance.csv'), index=False)
@@ -128,8 +133,9 @@ def main():
 	# 7. report
 	with open(os.path.join(args.out, 'REPORT.md'), 'w') as f:
 		f.write('# Paper 2 results: %s\n\n' % os.path.basename(args.config))
-		f.write('Glass-box SDF: `%s`, %d parameters, J* = %.4g, bootstrap-implied simultaneous eps (95%%) = %.3f\n\n'
-			% (rc.get('rung', 'additive_state'), E.theta.size, E.J_star, np.quantile(E.boot_dist, 0.95) / E.J_star))
+		f.write('Glass-box SDF: `%s`, %d parameters, L2 shrinkage %g (chosen on validation Sharpe), J* = %.4g, bootstrap-implied simultaneous eps (95%%) = %.3f\n\n'
+			% (rung, E.theta.size, E.shrink, E.J_star, np.quantile(E.boot_dist, 0.95) / E.J_star))
+		f.write('## Shrinkage selection (closed-form SDF)\n\n' + md_table(shrink_df) + '\n\n')
 		f.write('## Reference performance\n\n' + md_table(perf) + '\n\n')
 		for label, tab in tables.items():
 			f.write('## Identification: %s\n\n' % label + md_table(tab, 3) + '\n\n')

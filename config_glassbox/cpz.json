@@ -16,7 +16,7 @@
 	"train": {"epochs_unc": 256, "epochs_moment": 64, "epochs_cond": 1024, "lr": 0.001, "eval_every": 8},
 	"ladder": {"n_seeds": 9, "n_pairs": 5, "neural_hidden": [64, 64]},
 	"audit": {"beam": 40, "top": 15, "n_boot": 2000, "min_stocks": 30},
-	"rashomon": {"rung": "additive_state", "eps_grid": [0.002, 0.01, 0.05], "n_boot": 500, "lam_smooth": 0.001},
+	"rashomon": {"rung": "additive", "eps_grid": [0.002, 0.01, 0.05], "n_boot": 500, "lam_smooth": 0.001, "shrink_grid": [0.0, 0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0]},
 
 	"_external_comment": "kind F = SDF portfolio return (M = 1 - F), kind M = SDF; series cover train+valid+test in order. The notebook saves the CPZ GAN ensemble as sdf_normalized_ensemble.npy.",
 	"external_sdfs": {"cpz_gan_ensemble": {"path": "sample_checkpoints/sdf_normalized_ensemble.npy", "kind": "F"}},
