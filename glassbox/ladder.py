@@ -51,6 +51,8 @@ def screen_pairs(panel, M, top=5, chars=None, controls='market'):
 def _ensemble_eval(models, batch):
 	"""Average raw weights over seeds (as CPZ do for their 9 trials), then evaluate."""
 	from .pricing import normalized_weights, sharpe as _sr, explained_variation
+	for m in models:
+		m.eval()	# reloaded models start in train mode (dropout on)
 	with torch.no_grad():
 		w = torch.stack([m(batch) for m in models]).mean(0)
 		M = torch.stack([m.sdf(batch) for m in models]).mean(0)
