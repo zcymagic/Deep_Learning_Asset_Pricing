@@ -1,0 +1,2 @@
+description,t_discovery,t_stepwise,alpha,alpha_when_active,share_active,avg_stocks,t_holdout,alpha_holdout,p_holdout,p_holm,p_maxt,share_active_holdout,t_holdout_stepwise,p_holdout_stepwise,state_dep_var,t_state_dep,class
+Rel2High < -0.10 AND ST_REV > 0.30,-7.727574362964269,-7.738522895476663,-0.025368475182243617,-0.029412724848978104,0.8625,76.08695652173913,-2.895378969219175,-0.007161572489780237,0.001893505172513299,0.001893505172513299,0.002,1.0,-2.895378969219175,0.001893505172513299,BAAFFM,3.4910470239767646,mixed
