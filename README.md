@@ -34,7 +34,7 @@ python scripts/run_paper2.py --config config_glassbox/synthetic.json --out resul
 python -m pytest tests                                 # validation suite
 ```
 
-First results on the CPZ data: [docs/cpz_results.md](docs/cpz_results.md).
+First results on the CPZ data: [docs/cpz_results.md](docs/cpz_results.md). Extended CRSP + Open Source Asset Pricing panel through 2024: [docs/osap_results.md](docs/osap_results.md).
 
 For the CPZ data, put the Google Drive files under `datasets/`, pick state variables with
 `python scripts/run_paper1.py --config config_glassbox/cpz.json --list_macro`, and run with `config_glassbox/cpz.json`.

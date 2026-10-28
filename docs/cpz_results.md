@@ -46,10 +46,13 @@ rung, and about 40 minutes per Paper 2 model.
 | neural rung (CPZ-style FFN, no LSTM) | 18,625 | 1.50 | 0.44 | 0.11 |
 | **CPZ GAN ensemble (published)** | — | 3.02 | 1.39 | **0.77** |
 
-* **Shape functions help; state variation does not.** Moving from linear to additive raises the test
-  SR from 0.46 to 0.64. Letting shapes move with the three state variables raises the train SR but
-  lowers the test SR, even with the screened interactions (PM × ROE, D2P × Rel2High,
-  Rel2High × Variance, Rel2High × Resid_Var, CTO × PM).
+* **Shape functions help; whether state variation helps depends on the state variables.** Moving from
+  linear to additive raises the test SR from 0.46 to 0.64. With the baseline state variables (credit
+  spread, term spread, VXO), letting shapes move with the state raises the train SR but lowers the test
+  SR, even with the screened interactions (PM × ROE, D2P × Rel2High, Rel2High × Variance,
+  Rel2High × Resid_Var, CTO × PM). The robustness check below shows this is **specific to the baseline
+  set**: with Welch-Goyal, real-activity or valuation state variables, the state-varying additive SDF
+  matches the static one.
 * **My neural rung is not a usable benchmark.** It omits CPZ's LSTM state network, their dropout and
   their hyperparameter search, and it overfits. Measured against it, the "price of interpretability"
   is negative for every glass-box rung, which says nothing. The reference is the published CPZ GAN.
@@ -95,7 +98,7 @@ rung, and about 40 minutes per Paper 2 model.
   | rule | SDFs | hold-out t | classification |
   |---|---|---|---|
   | recent winners (ST_REV > 0.1) far below their 52-week high (Rel2High < −0.1) | CAPM / FF3 / FF5 + UMD | −9.8 / −10.3 / −8.5 | — |
-  | recent winners (ST_REV > 0.3) with weak 12-month momentum (r12_2 < −0.3) | additive + state, additive + state + pairs | −7.1, −6.6 | state-dependent: alpha loads on VXO, t ≈ −2.8 |
+  | recent winners (ST_REV > 0.3) with weak 12-month momentum (r12_2 < −0.3) | additive + state, additive + state + pairs | −7.1, −6.6 | state-dependent (alpha loads on VXO, t ≈ −2.8) — **not robust**, see the state-variable robustness section |
   | — | linear + state | −6.7 | — |
 
   None of the factor sets contains a reversal factor. The same characteristic dominates the glass-box
@@ -208,10 +211,62 @@ estimated there are not comparable to weights estimated out of sample. Two varia
   glass-box audit numbers differ slightly from the ladder audit, which used the raw-weight SDF:
   5.02 vs 5.15.
 
+## Robustness to the state variables
+
+`scripts/run_state_robustness.py` repeats Paper 1 under five state-variable sets. The state-varying
+rungs are refit with nine seeds, and every SDF is re-audited with the set as its audit state variables.
+Supporting files: `cpz_results/state_robustness_*.csv`.
+
+| set | variables |
+|---|---|
+| baseline | BAAFFM, T10YFFM, VXOCLSx |
+| Welch-Goyal | dfy, tms, svar |
+| real activity | UNRATE, INDPRO, CPIAUCSL |
+| valuation | dp, tbl, ntis |
+| VXO only | VXOCLSx |
+
+The baseline set reproduces the original run exactly, so the refits are deterministic.
+
+### State-varying SDFs (test Sharpe ratio, monthly; static additive = 0.64)
+
+| state set | linear + state | additive + state |
+|---|---|---|
+| baseline | 0.31 | 0.51 |
+| Welch-Goyal | 0.56 | 0.63 |
+| real activity | 0.41 | 0.61 |
+| valuation | 0.56 | **0.66** |
+| VXO only | 0.31 | 0.47 |
+
+* **Correction:** the earlier finding that state variation hurts out of sample holds only for the
+  baseline set and for VXO alone. With Welch-Goyal, real-activity or valuation variables, the
+  state-varying additive SDF matches the static one (0.61–0.66 against 0.64). The valuation set is
+  slightly better, but it does not beat the static SDF by a meaningful margin.
+* Implied volatility seems to be the problem: both sets containing VXO do worst.
+
+### Audit across state sets
+
+* **The reversal failure is robust.** In every set, the top confirmed failure of every SDF except the
+  CPZ GAN is a short-term-reversal rule:
+  * CAPM and FF5 + UMD: recent winners below their 52-week high, hold-out t = −9.8 and −8.5 in every
+    set. The one exception is FF5 + UMD under the valuation set, where the top rule is recent winners
+    with weak momentum, t = −7.0;
+  * the static additive glass-box SDF: hold-out t = −2.9;
+  * the state-varying SDFs: recent winners with weak momentum or below the 52-week high, hold-out
+    |t| from 3.2 to 7.1. In one case (linear + state, real activity) the top rule is the mirror image,
+    small recent losers with positive alpha (t = 5.1).
+* **Its classification is not robust.** The "state-dependent, loads on VXO" label from the baseline run
+  does not survive. The rule's alpha loads significantly on a different state variable in different
+  sets (VXO, term spread, T-bill rate, credit spread), or on none, so it is classified state-dependent,
+  characteristic or mixed depending on the set. The defensible statement is that the reversal failure
+  is a **characteristic** failure whose time variation is not tied to any particular macro state.
+* **No confirmed failure for the CPZ GAN in any set.** Its global rejection (max |t| = 5.97) is
+  unchanged, but none of its discovered rules replicates out of sample (max-t p ≥ 0.99).
+* **Global tests are unaffected for the state-free SDFs.** Their largest hold-out |t| comes from
+  characteristic-only rules, so it is identical in every set.
+
 ## Caveats and next steps
 
-* **Single configuration.** These are first-pass results. Not yet varied:
-  * the state-variable set;
+* **Remaining robustness checks.** The state-variable set is done (above). Not yet varied:
   * the knots and rule thresholds;
   * the discovery window;
   * the friction list.
@@ -235,6 +290,7 @@ python scripts/run_paper1.py --config config_glassbox/cpz.json --out results/pap
 python scripts/run_paper2.py --config config_glassbox/cpz.json --out results/paper2_cpz_additive --rung additive
 python scripts/run_paper2.py --config config_glassbox/cpz.json --out results/paper2_cpz_additive_state --rung additive_state
 python scripts/run_combined.py --config config_glassbox/cpz.json --models results/paper1_cpz_neural --out results/combined_cpz
+python scripts/run_state_robustness.py --config config_glassbox/cpz.json --models results/paper1_cpz_neural --out results/state_robustness_cpz
 ```
 
 The additive + state Paper 2 run used `n_boot = 100` instead of the config's 500, to fit in a CPU

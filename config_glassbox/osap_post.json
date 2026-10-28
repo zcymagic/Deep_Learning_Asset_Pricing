@@ -1,0 +1,118 @@
+{
+	"individual_feature_file": "datasets/osap/Char_train.npz",
+	"individual_feature_file_valid": "datasets/osap/Char_valid.npz",
+	"individual_feature_file_test": "datasets/osap/Char_post.npz",
+	"macro_feature_file": "datasets/osap/macro_train.npz",
+	"macro_feature_file_valid": "datasets/osap/macro_valid.npz",
+	"macro_feature_file_test": "datasets/osap/macro_post.npz",
+	"macro_idx": null,
+	"state_vars": [
+		"dfy",
+		"tms",
+		"svar"
+	],
+	"audit_state_vars": [
+		"dfy",
+		"tms",
+		"svar",
+		"tbl",
+		"d/p",
+		"ntis",
+		"infl",
+		"b/m"
+	],
+	"lta_chars": [
+		"LME",
+		"Spread",
+		"IdioVol",
+		"Resid_Var",
+		"LTurnover",
+		"SUV",
+		"Variance",
+		"Rel2High",
+		"AT"
+	],
+	"value_group": [
+		"BEME",
+		"A2ME",
+		"C",
+		"CF",
+		"CF2P",
+		"D2P",
+		"E2P",
+		"S2P"
+	],
+	"train": {
+		"epochs_unc": 256,
+		"epochs_moment": 64,
+		"epochs_cond": 1024,
+		"lr": 0.001,
+		"eval_every": 8
+	},
+	"ladder": {
+		"n_seeds": 9,
+		"n_pairs": 5,
+		"neural_hidden": [
+			64,
+			64
+		]
+	},
+	"audit": {
+		"beam": 40,
+		"top": 15,
+		"n_boot": 2000,
+		"min_stocks": 30
+	},
+	"rashomon": {
+		"rung": "additive",
+		"eps_grid": [
+			0.002,
+			0.01,
+			0.05
+		],
+		"n_boot": 200,
+		"lam_smooth": 0.001,
+		"shrink_grid": [
+			0.0,
+			0.0001,
+			0.001,
+			0.01,
+			0.1,
+			1.0,
+			10.0,
+			100.0
+		]
+	},
+	"external_sdfs": {},
+	"factor_files": {
+		"capm": {
+			"path": "datasets/factors/ff5_umd_osap_post.csv",
+			"date_col": "date",
+			"columns": [
+				"Mkt-RF"
+			]
+		},
+		"ff3": {
+			"path": "datasets/factors/ff5_umd_osap_post.csv",
+			"date_col": "date",
+			"columns": [
+				"Mkt-RF",
+				"SMB",
+				"HML"
+			]
+		},
+		"ff5_umd": {
+			"path": "datasets/factors/ff5_umd_osap_post.csv",
+			"date_col": "date",
+			"columns": [
+				"Mkt-RF",
+				"SMB",
+				"HML",
+				"RMW",
+				"CMA",
+				"UMD"
+			]
+		}
+	},
+	"_comment": "CRSP + Open Source Asset Pricing panel built by scripts/build_osap_panel.py (median imputation, datasets/osap; datasets/osap_cc holds the complete-case version). post-sample: same train / valid, test 2017-2024. State variables are Welch-Goyal series (VXO is not available after 2021)."
+}
