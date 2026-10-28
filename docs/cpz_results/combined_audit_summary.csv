@@ -1,0 +1,8 @@
+model,holdout_max_abs_t,holdout_global_p,holdout_rms_alpha,n_rules_discovered,n_sig_limits-to-arbitrage,share_limits-to-arbitrage,n_sig_state-dependent,share_state-dependent,n_sig_characteristic,share_characteristic,n_sig_mixed,share_mixed,confirmation
+combo_train [valid+test],5.1440665634292575,0.0025,0.0024793129173791392,2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,valid+test
+glass_box_additive [valid+test],5.021764277978913,0.003,0.001904258440237505,1,0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,valid+test
+cpz_gan [valid+test],5.974845536366814,0.0005,0.002538419159973697,1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,valid+test
+combo_valid [test],4.422870600481372,0.008,0.002132886206917748,1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,test
+combo_train [test],4.78081928674101,0.0055,0.0022049979728152396,2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,test
+glass_box_additive [test],4.818259692788211,0.005,0.0019274603948679107,1,0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,test
+cpz_gan [test],5.503537415339315,0.0,0.0022438486829020297,1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,test

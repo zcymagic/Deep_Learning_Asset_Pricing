@@ -167,6 +167,47 @@ every member.
 
 ---
 
+## Combined glass-box + CPZ GAN SDF
+
+`scripts/run_combined.py` builds M = 1 − b₁·F_glass − b₂·F_GAN. F_glass is the normalized SDF portfolio of
+the 9-seed additive glass-box ensemble, F_GAN is the published CPZ ensemble, and b holds their tangency
+weights.
+
+The GAN was fit on the training period, where its Sharpe ratio is an in-sample 3.0, so weights
+estimated there are not comparable to weights estimated out of sample. Two variants are reported:
+
+| variant | weights estimated on | weight on glass-box / GAN | train SR | valid SR | test SR |
+|---|---|---|---|---|---|
+| combo_train | 1967–1986 | 0.23 / 0.77 | 3.15 | 1.46 | **0.78** |
+| combo_valid | 1987–1991 (both models out of sample) | 0.41 / 0.59 | 3.00 | 1.47 | **0.78** |
+| CPZ GAN alone | — | — | 3.02 | 1.39 | 0.77 |
+| glass-box additive alone | — | — | 1.24 | 1.26 | 0.64 |
+
+* **The combination spans both components but adds little Sharpe out of sample.** Neither component
+  has significant test-period alpha on the combination (|t| ≤ 1.4). But the test Sharpe ratio rises
+  only from 0.77 to 0.78. The two-way alphas found earlier show the components carry different priced
+  information. With weights fixed before the test period, most of that gain does not carry over.
+* **The audit improves slightly on the GAN, not on the glass-box SDF.** Discovery is on 1967–1986.
+  Each SDF is compared with its components on the same confirmation sample:
+
+  | SDF | confirmation 1987–2016: max \|t\| (p) | confirmation 1992–2016: max \|t\| (p) |
+  |---|---|---|
+  | combo_valid | — (weights use 1987–91) | **4.42 (0.008)** |
+  | combo_train | 5.14 (0.003) | 4.78 (0.005) |
+  | glass-box additive | 5.02 (0.003) | 4.82 (0.005) |
+  | CPZ GAN | 5.97 (< 0.001) | 5.50 (< 0.001) |
+
+  The combination is still rejected, but its worst-case pricing error is the smallest of any SDF
+  audited so far.
+* **The reversal failure disappears.** The glass-box SDF's confirmed failure (recent winners far
+  below their 52-week high; hold-out t −2.1 to −2.4) is not among the combination's discovered rules.
+  The GAN prices it.
+* **None of the combination's discovered rules replicate** (hold-out |t| ≤ 2.5, max-t p ≥ 0.92). Its
+  remaining rejection is diffuse: the stepwise search finds no specific readable portfolio to explain it.
+* **Scaling note:** the components here enter as normalized SDF portfolios (Σ|w| = 1 each month). The
+  glass-box audit numbers differ slightly from the ladder audit, which used the raw-weight SDF:
+  5.02 vs 5.15.
+
 ## Caveats and next steps
 
 * **Single configuration.** These are first-pass results. Not yet varied:
@@ -176,8 +217,8 @@ every member.
   * the friction list.
 * **Neural benchmark.** Replace my neural rung with a faithful CPZ replication (LSTM state network,
   CPZ hyperparameters), or use the published GAN as the only complex benchmark.
-* **Combination.** Estimate the tangency of {glass-box SDF, CPZ GAN} and audit it. The two-way
-  spanning results suggest it beats both.
+* **Combination (done, see above).** Next: combination weights that vary with the macro state, and
+  auditing the combination with rules beyond the beam.
 * **Unreplicated global rejections.** Investigate why the CPZ GAN's global rejection does not survive
   as a confirmed discovered rule. Candidates: a smaller stepwise stopping threshold, or rules beyond
   the beam.
@@ -193,6 +234,7 @@ python scripts/run_paper1.py --config config_glassbox/cpz.json --out results/pap
 python scripts/run_paper1.py --config config_glassbox/cpz.json --out results/paper1_cpz_factors --reuse results/paper1_cpz   # adds the neural rung if not saved there
 python scripts/run_paper2.py --config config_glassbox/cpz.json --out results/paper2_cpz_additive --rung additive
 python scripts/run_paper2.py --config config_glassbox/cpz.json --out results/paper2_cpz_additive_state --rung additive_state
+python scripts/run_combined.py --config config_glassbox/cpz.json --models results/paper1_cpz_neural --out results/combined_cpz
 ```
 
 The additive + state Paper 2 run used `n_boot = 100` instead of the config's 500, to fit in a CPU
