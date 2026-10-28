@@ -51,6 +51,8 @@ def screen_pairs(panel, M, top=5, chars=None, controls='market'):
 def _ensemble_eval(models, batch):
 	"""Average raw weights over seeds (as CPZ do for their 9 trials), then evaluate."""
 	from .pricing import normalized_weights, sharpe as _sr, explained_variation
+	for m in models:
+		m.eval()	# reloaded models start in train mode (dropout on)
 	with torch.no_grad():
 		w = torch.stack([m(batch) for m in models]).mean(0)
 		M = torch.stack([m.sdf(batch) for m in models]).mean(0)
@@ -61,14 +63,22 @@ def _ensemble_eval(models, batch):
 
 
 def run_ladder(train, valid, test, state_vars, rungs=DEFAULT_RUNGS, cfg=TrainConfig(), n_seeds=1,
-		n_pairs=5, adversary_moments=8, verbose=True):
-	"""Fit every rung; return (results DataFrame, {name: [models]}, {name: test evaluation})."""
+		n_pairs=5, adversary_moments=8, verbose=True, prefitted=None):
+	"""Fit every rung; return (results DataFrame, {name: [models]}, {name: test evaluation}).
+
+	prefitted: {rung name: {'states': [state_dict per seed], 'pairs': [(j, k)] or None}} reloads rungs
+	fitted earlier instead of refitting them (e.g. add the slow neural rung to a finished run).
+	"""
+	prefitted = prefitted or {}
 	b_tr, b_va, b_te = [p.to_torch(state_vars) for p in (train, valid, test)]
 	K, P, Md = train.K, len(state_vars), len(train.macro_names)
 	fitted, evals, rows = {}, {}, []
 	pairs_used = None
 	for rung in rungs:
 		spec = dict(rung)
+		pre = prefitted.get(rung['name'])
+		if pre is not None and spec.get('pairs') == 'screen':
+			spec['pairs'] = [tuple(p) for p in pre['pairs']]
 		if spec.get('pairs') == 'screen':
 			base = fitted.get('additive_state') or fitted.get('additive')
 			if base is None:
@@ -78,7 +88,11 @@ def run_ladder(train, valid, test, state_vars, rungs=DEFAULT_RUNGS, cfg=TrainCon
 			pairs_used = [(j, k) for j, k, _ in screened]
 			spec['pairs'] = pairs_used
 		models = []
-		for s in range(n_seeds):
+		for state in (pre['states'] if pre is not None else []):
+			model = build_sdf(spec, K, P, Md)
+			model.load_state_dict(state)
+			models.append(model)
+		for s in range(0 if pre is not None else n_seeds):
 			torch.manual_seed(s)
 			model = build_sdf(spec, K, P, Md)
 			adv = NeuralAdversary(K, Md, adversary_moments)

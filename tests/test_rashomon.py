@@ -3,7 +3,7 @@ import torch
 
 from glassbox.adversary import NeuralAdversary
 from glassbox.pricing import moment_loss
-from glassbox.rashomon import RashomonEllipsoid, _trs_max
+from glassbox.rashomon import RashomonEllipsoid, _trs_max, select_shrinkage
 from glassbox.sdf import AdditiveSDF, LinearSDF
 from glassbox.synthetic import SyntheticSpec, make_synthetic_panel
 
@@ -70,3 +70,22 @@ def test_bootstrap_tables_and_ambiguity(small_panel):
 	A, sign_amb, index = E.weight_ambiguity(b)
 	assert np.isfinite(A[panel.mask]).all() and np.isnan(A[~panel.mask]).all()
 	assert index.shape == (panel.T,)
+
+
+def test_shrinkage_selection_and_penalized_objective(small_panel):
+	panel, _ = small_panel
+	tr, va = panel.subset_time(range(40)), panel.subset_time(range(40, 60))
+	model = AdditiveSDF(panel.K, 1, n_knots=5, state_varying=True)
+	b_tr, b_va = tr.to_torch(['credit_spread']), va.to_torch(['credit_spread'])
+	torch.manual_seed(0)
+	with torch.no_grad():
+		h = NeuralAdversary(panel.K, len(panel.macro_names), 4)(b_tr)
+	best, df = select_shrinkage(model, b_tr, h, b_va, grid=(0.0, 0.1, 10.0))
+	assert best in (0.0, 0.1, 10.0) and len(df) == 3
+	assert df.loc[df['shrink'] == best, 'sharpe_valid'].item() == df['sharpe_valid'].max()
+	E0 = RashomonEllipsoid(model, b_tr, h, eps=0.01, n_boot=0, shrink=0.0)
+	n0 = np.linalg.norm(E0.theta)
+	E1 = RashomonEllipsoid(model, b_tr, h, eps=0.01, n_boot=0, shrink=10.0)
+	assert np.linalg.norm(E1.theta) < n0
+	for th in E1.sample(3):
+		assert np.isclose(E1.objective(th), 1.01 * E1.J_star, rtol=1e-6)

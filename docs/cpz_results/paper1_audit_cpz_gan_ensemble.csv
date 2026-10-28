@@ -1,0 +1,2 @@
+description,t_discovery,t_stepwise,alpha,alpha_when_active,share_active,avg_stocks,t_holdout,alpha_holdout,p_holdout,p_holm,p_maxt,share_active_holdout,t_holdout_stepwise,p_holdout_stepwise,state_dep_var,t_state_dep,class
+RNA > 0.30 AND AC < -0.30,6.343179343804758,6.3299388935288885,0.033996281244641366,0.039415978254656654,0.8625,44.99516908212561,-1.8302518861587957,-0.0023287429184253748,0.9663938588270263,0.9663938588270263,0.9685,1.0,-1.8302518861587957,0.9663938588270263,UNRATE,-1.4553244628532969,characteristic
