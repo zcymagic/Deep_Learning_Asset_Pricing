@@ -115,7 +115,37 @@ additive glass-box SDF prices the reversal rule out of sample (t = −0.8) and c
   glass-box SDFs (p ≥ 0.18) pass. The static additive SDF (p = 0.013) and FF3 (p = 0.006) are still
   rejected.
 
-So the reversal mispricing that dominated 1987–2016 has largely faded since 2017.
+The reversal mispricing that dominated 1987–2016 is much weaker in 2017–2024. The next section shows
+this is the tail of a gradual decline, not a 2017 break.
+
+### The reversal rules' alpha over time
+
+![Reversal rule alpha over time](osap_results/rule_alpha.png)
+
+`scripts/plot_rule_alpha.py` tracks the two reversal rules' equal-weighted portfolios over 1967–2024,
+against FF5 + UMD:
+* **Top panel:** rolling 60-month alpha with ±2 SE bands.
+* **Bottom panel:** cumulative pricing error with factor betas fixed on 1967–1986, so there is no
+  look-ahead. The slope at any date is the alpha.
+
+| rule | 1967–1986 | 1987–2016 | 2017–2024 |
+|---|---|---|---|
+| recent winners with weak momentum | −2.46% / month (t = −14.6) | −1.44% (t = −5.4) | −0.78% (t = −1.4) |
+| recent winners far below 52-week high | −2.29% (t = −15.6) | −1.38% (t = −5.1) | −0.68% (t = −1.4) |
+
+(Newey-West t-statistics; average 130–290 stocks per rule per month; tables in
+`osap_results/rule_alpha_periods.csv`.)
+
+* **A gradual decline, not a break.** The alpha shrinks steadily from about −2.5% a month in the 1970s
+  and 1980s. It is near zero around 2003–2008 and about −0.5% to −1% a month since. The post-2016
+  sample does not show a new regime: the alpha continues a three-decade decline, consistent with
+  growing arbitrage capital and falling trading costs for short-term reversal strategies.
+* **Not significant since 2017, but not shown to be zero.** The 2017–2024 alpha is still about −8% a
+  year. With 96 months its t-statistic is only −1.4, so the data cannot tell a smaller negative alpha
+  from zero. The audit's "no longer rejected" result for 2017–2024 is partly a power result.
+* **Both rules behave almost identically.** They select overlapping stocks (recent winners with poor
+  longer-term price performance). The failure is therefore one effect, recent-winner reversal among
+  long-term losers, not two.
 
 **Pooling caveat.** An earlier version of the post-sample audit pooled 1987–1991 with 2017–2024. That
 gave reversal t-statistics of −4 to −6 and should not be used. `run_paper1.py --holdout test` now
@@ -167,8 +197,9 @@ investment (DPI2A), operating leverage, idiosyncratic volatility, share issuance
   * the reversal failure weakens sharply;
   * most models are no longer rejected on 2017–2024 alone.
 
-  Whether that reflects arbitrage of the reversal effect, a regime change, or simply 96 months of low
-  power is the natural next question. The rule-level alphas over time would answer it.
+  The rule-level alphas over time show this is the continuation of a gradual decline since the early
+  1990s rather than a post-2016 break. The 2017–2024 alpha is still about −8% a year but, with 96
+  months, not statistically distinguishable from zero.
 
 ## Reproducing
 
@@ -179,4 +210,5 @@ python scripts/download_ff_factors.py --config config_glassbox/osap_post.json --
 python scripts/run_paper1.py --config config_glassbox/osap.json --out results/paper1_osap --skip_neural
 python scripts/run_paper1.py --config config_glassbox/osap_post.json --out results/paper1_osap_post_only --skip_neural --reuse results/paper1_osap --holdout test
 python scripts/run_paper2.py --config config_glassbox/osap.json --out results/paper2_osap_additive --rung additive
+python scripts/plot_rule_alpha.py --out docs/osap_results
 ```

@@ -1,0 +1,7 @@
+rule,period,alpha_pct_per_month,t_nw,months,avg_stocks
+Recent winners with weak momentum,1967-1986 (train),-2.459730059461003,-14.59375613168883,240,128.4625
+Recent winners with weak momentum,1987-2016 (valid + test),-1.4416451507465529,-5.408546187742299,360,231.4
+Recent winners with weak momentum,2017-2024 (post),-0.7810994550829898,-1.3732755801916712,96,170.65625
+Recent winners far below 52-week high,1967-1986 (train),-2.2937136206294375,-15.643614455207016,240,155.79583333333332
+Recent winners far below 52-week high,1987-2016 (valid + test),-1.379241440804966,-5.139643459483972,360,287.3666666666667
+Recent winners far below 52-week high,2017-2024 (post),-0.683378429412857,-1.3719414457904981,96,220.375
