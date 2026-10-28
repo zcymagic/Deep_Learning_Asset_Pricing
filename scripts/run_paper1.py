@@ -86,6 +86,8 @@ def main():
 	ap.add_argument('--list_macro', action='store_true')
 	ap.add_argument('--skip_neural', action='store_true')
 	ap.add_argument('--reuse', default=None, help='output dir of an earlier run: reload its fitted rungs, fit only the missing ones')
+	ap.add_argument('--holdout', choices=['valid+test', 'test'], default='valid+test',
+		help='audit confirmation sample; use test for a clean out-of-sample period such as 2017-2024')
 	args = ap.parse_args()
 	torch.set_num_threads(max(1, os.cpu_count() or 1))
 	cfg = load_config(args.config)
@@ -140,23 +142,24 @@ def main():
 		torch.save([m.state_dict() for m in models], os.path.join(args.out, 'model_%s.pt' % name))
 
 	# 3. audit: discovery on train, confirmation on valid + test
-	holdout = concat_time([valid, test])
+	holdout = concat_time([valid, test]) if args.holdout == 'valid+test' else test
+	ho = slice(0, None) if args.holdout == 'valid+test' else slice(valid.T, None)	# rows of the concatenated SDF
 	fixed_rules = audit.fixed_rule_class(train, audit_states)
 	sdfs = {}
 	b_va, b_te = valid.to_torch(state_vars), test.to_torch(state_vars)
 	for name, models in fitted.items():
 		ev = [_ensemble_eval(models, b) for b in (b_tr, b_va, b_te)]
-		sdfs[name] = (ev[0]['M'], np.concatenate([ev[1]['M'], ev[2]['M']]))
+		sdfs[name] = (ev[0]['M'], np.concatenate([ev[1]['M'], ev[2]['M']])[ho])
 	for name, spec in cfg.get('external_sdfs', {}).items():
 		if os.path.exists(spec['path']):
 			Ms = external_sdf(spec, [train.T, valid.T, test.T])
-			sdfs[name] = (Ms[0], np.concatenate(Ms[1:]))
+			sdfs[name] = (Ms[0], np.concatenate(Ms[1:])[ho])
 		else:
 			print('[audit] skipping %s: %s not found' % (name, spec['path']))
 	for name, spec in cfg.get('factor_files', {}).items():
 		if os.path.exists(spec['path']):
 			Ms = factor_model_sdf(spec, [train, valid, test])
-			sdfs[name] = (Ms[0], np.concatenate(Ms[1:]))
+			sdfs[name] = (Ms[0], np.concatenate(Ms[1:])[ho])
 		else:
 			print('[audit] skipping %s: %s not found' % (name, spec['path']))
 	summaries = []
@@ -173,7 +176,7 @@ def main():
 		f.write('## Complexity ladder (price of interpretability)\n\n' + md_table(ladder_df) + '\n\n')
 		f.write('## Glass-box SDF (%s): weight-variance shares\n\n' % gb_name)
 		f.write(md_table(pd.read_csv(os.path.join(args.out, 'importance.csv'))) + '\n\n')
-		f.write('## Audit summary (discovery: train; confirmation: valid + test)\n\n' + md_table(summary_df) + '\n\n')
+		f.write('## Audit summary (discovery: train; confirmation: %s)\n\n' % args.holdout.replace('+', ' + ') + md_table(summary_df) + '\n\n')
 		for name in sdfs:
 			t = pd.read_csv(os.path.join(args.out, 'audit_%s.csv' % name))
 			cols = [c for c in ['description', 't_discovery', 't_stepwise', 't_holdout', 't_holdout_stepwise', 'p_maxt',

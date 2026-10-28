@@ -1,0 +1,2 @@
+description,t_discovery,t_stepwise,alpha,alpha_when_active,share_active,avg_stocks,t_holdout,alpha_holdout,p_holdout,p_holm,p_maxt,share_active_holdout,t_holdout_stepwise,p_holdout_stepwise,state_dep_var,t_state_dep,class
+ST_REV > 0.30 AND r12_2 < -0.10,-5.977769583747317,-5.990062012650359,-0.013413952423394318,-0.013413952423394318,1.0,233.64583333333334,-0.8251011523019146,-0.0017044671130641493,0.20465708279003336,0.20465708279003336,0.224,1.0,-0.8251011523019146,0.20465708279003336,svar,1.6013812579759044,characteristic
