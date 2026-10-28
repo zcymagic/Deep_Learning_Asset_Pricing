@@ -1,23 +1,25 @@
 /*  Export CRSP monthly stock data for the glass-box SDF panel (OSAP characteristics + CRSP returns).
 
-    Run on WRDS (SAS Studio or a batch job). Output: ~/crsp_msf_1966_2024.csv.gz, about 3 million rows.
+    Run on WRDS (SAS Studio or a batch job). Output: ~/crsp_msf_1961_2024.csv.gz, about 3.3 million rows.
+    Starts in 1961 so that 60-month past-return characteristics are complete from 1967 (CPZ sample start).
 
     Universe: common stocks (share codes 10, 11) on NYSE, AMEX and NASDAQ (exchange codes 1, 2, 3),
     with share and exchange codes as of each month (from msenames, not the header codes).
     Delisting returns from msedelist are kept in separate columns, so the Python side can
     combine them with RET and apply its own rule for missing delisting returns.
 
-    Columns: permno, yyyymm, date, ret, retx, dlret, dlstcd, prc, shrout, shrcd, exchcd, siccd
+    Columns: permno, yyyymm, date, ret, retx, dlret, dlstcd, prc, shrout, vol, cfacshr, shrcd, exchcd, siccd
+    (vol for turnover / volume characteristics, cfacshr for split-adjusted share issuance)
     This is licensed CRSP data: share the output only as your WRDS terms allow.
 */
 
-%let start = '01JAN1966'd;
+%let start = '01JAN1961'd;
 %let end   = '31DEC2024'd;
 
 /* monthly returns, prices, shares */
 proc sql;
     create table msf as
-    select a.permno, a.date, a.ret, a.retx, a.prc, a.shrout
+    select a.permno, a.date, a.ret, a.retx, a.prc, a.shrout, a.vol, a.cfacshr
     from crsp.msf as a
     where a.date between &start and &end;
 quit;
@@ -48,7 +50,7 @@ data out;
     set msf_dl;
     yyyymm = year(date) * 100 + month(date);
     format date yymmddn8.;
-    keep permno yyyymm date ret retx dlret dlstcd prc shrout shrcd exchcd siccd;
+    keep permno yyyymm date ret retx dlret dlstcd prc shrout vol cfacshr shrcd exchcd siccd;
 run;
 
 proc sort data=out nodupkey;
@@ -56,7 +58,7 @@ proc sort data=out nodupkey;
 run;
 
 /* gzip-compressed CSV in the home directory (needs SAS 9.4M5 or later for the GZIP option) */
-filename outgz zip "~/crsp_msf_1966_2024.csv.gz" gzip;
+filename outgz zip "~/crsp_msf_1961_2024.csv.gz" gzip;
 
 proc export data=out outfile=outgz dbms=csv replace;
 run;
