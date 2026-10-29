@@ -1,0 +1,4 @@
+model,max_abs_t,global_p,n_rules,n_confirmed,top_rule,t_holdout,p_maxt,class,reversal_rule_confirmed
+additive_k5,3.6553589879290547,0.069,2,0,CF > 0.30 AND NI < -0.10,-1.8616349972848645,0.9985,characteristic,False
+additive_k9,4.993514038166721,0.002,1,0,ST_REV > 0.30 AND r12_2 < -0.10,-0.8251011523019146,0.224,characteristic,False
+additive_k13,4.29501460684144,0.0135,0,0,,,,,False
