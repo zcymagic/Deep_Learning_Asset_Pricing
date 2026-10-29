@@ -184,6 +184,13 @@ investment (DPI2A), operating leverage, idiosyncratic volatility, share issuance
 
 ---
 
+## Robustness
+
+Rule thresholds and knot counts: [robustness.md](robustness.md). On this panel the factor models'
+reversal failure is confirmed under every rule grid (hold-out t from −7.8 to −11.1). The additive SDF
+has no confirmed failure in four of five grids. Short-term reversal and the value group stay identified
+with 5, 9 and 13 knots.
+
 ## Summary
 
 * **Replicates on an independently built panel:**

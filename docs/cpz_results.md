@@ -266,8 +266,9 @@ The baseline set reproduces the original run exactly, so the refits are determin
 
 ## Caveats and next steps
 
-* **Remaining robustness checks.** The state-variable set is done (above). Not yet varied:
-  * the knots and rule thresholds;
+* **Remaining robustness checks.** The state-variable set is done (above), and so are the knots and
+  rule thresholds ([robustness.md](robustness.md): the factor models' reversal failure and the Paper 2
+  identification of reversal and value survive every grid and knot count). Not yet varied:
   * the discovery window;
   * the friction list.
 * **Neural benchmark.** Replace my neural rung with a faithful CPZ replication (LSTM state network,

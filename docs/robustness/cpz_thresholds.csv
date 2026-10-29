@@ -1,0 +1,36 @@
+model,max_abs_t,global_p,n_rules,n_confirmed,top_rule,t_holdout,p_maxt,class,reversal_rule_confirmed,grid
+linear,7.241335305168146,0.0,4,0,IdioVol < -0.10 AND MktBeta > 0.30 AND svar > -0.03,-1.8740400698927637,0.1145,mixed,False,baseline
+additive,5.150094362694852,0.002,1,1,Rel2High < -0.10 AND ST_REV > 0.30,-2.895378969219175,0.002,mixed,True,baseline
+additive_state,7.461549519879338,0.0,2,2,r12_2 < -0.30 AND ST_REV > 0.30,-7.133026144397312,0.0,state-dependent,True,baseline
+cpz_gan_ensemble,5.974845536366852,0.0005,1,0,RNA > 0.30 AND AC < -0.30,-1.8302518861587957,0.9685,characteristic,False,baseline
+capm,11.89205295686942,0.0,2,1,ST_REV > 0.10 AND Rel2High < -0.10,-9.84770755622413,0.0,mixed,True,baseline
+ff3,10.143784849415088,0.0,2,1,ST_REV > 0.10 AND Rel2High < -0.10,-10.317749541959033,0.0,mixed,True,baseline
+ff5_umd,8.658953462386146,0.0,2,1,Rel2High < -0.10 AND ST_REV > 0.10,-8.46828895152785,0.0,mixed,True,baseline
+linear,7.241335305168146,0.0,0,0,,,,,False,coarse
+additive,5.150094362694852,0.002,1,1,r12_2 < -0.30 AND ST_REV > 0.30,-1.7017554147030953,0.033,state-dependent,True,coarse
+additive_state,7.461549519879338,0.0,1,1,r12_2 < -0.30 AND ST_REV > 0.30,-7.133026144397312,0.0,state-dependent,True,coarse
+cpz_gan_ensemble,5.974845536366852,0.0005,2,0,RNA > 0.30 AND AC < -0.30,-1.8302518861587982,0.9975,characteristic,False,coarse
+capm,11.89205295686942,0.0,5,4,ST_REV > 0.30 AND r12_2 < -0.30,-10.423507826553681,0.0,characteristic,True,coarse
+ff3,10.143784849415088,0.0,5,4,ST_REV > 0.30 AND r12_2 < -0.30,-9.733241707745687,0.0,state-dependent,True,coarse
+ff5_umd,8.658953462386146,0.0,1,1,ST_REV > 0.30,-1.842219231830779,0.0185,characteristic,True,coarse
+linear,6.777848801558309,0.0,2,1,LT_Rev > 0.10 AND SUV < -0.40 AND svar > -0.03,-3.3316889816526993,0.002,mixed,False,fine
+additive,5.162154989455488,0.002,1,1,Rel2High < -0.20 AND ST_REV > 0.10,-2.950084472930353,0.003,mixed,True,fine
+additive_state,6.847174397143634,0.0005,1,1,ST_REV > 0.10 AND Rel2High < -0.20,-7.347431392671737,0.0,mixed,True,fine
+cpz_gan_ensemble,5.4186690187991005,0.0025,2,0,LT_Rev > 0.20 AND NOA < -0.40,0.7513533989608586,0.3325,characteristic,False,fine
+capm,10.939580468528957,0.0,2,2,ST_REV > 0.20 AND Rel2High < -0.10,-10.063863400319295,0.0,mixed,True,fine
+ff3,9.321988922122408,0.0,2,2,ST_REV > 0.10 AND Rel2High < -0.20,-9.343239090035423,0.0,mixed,True,fine
+ff5_umd,8.3195200406185,0.0,5,2,r12_2 < -0.20 AND ST_REV > 0.30,-7.30943256529719,0.0,state-dependent,True,fine
+linear,6.777848801558309,0.0,2,0,OP < -0.40 AND ST_REV > 0.20 AND T10YFFM < 0.31,-0.4416852356426862,0.5065,state-dependent,False,extreme
+additive,5.162154989455488,0.002,2,0,PROF < -0.40 AND r2_1 > 0.20 AND svar < -0.03,1.52698711393386,0.1205,state-dependent,False,extreme
+additive_state,6.847174397143634,0.0005,1,0,r12_2 > 0.20 AND FC2Y > 0.20 AND BAAFFM < 0.23,0.3147398745648807,0.4105,state-dependent,False,extreme
+cpz_gan_ensemble,5.4186690187991005,0.0025,4,0,SUV > 0.20 AND SGA2S > 0.20,2.238212116677358,0.0505,mixed,False,extreme
+capm,10.421763707937433,0.0,2,2,r12_2 < -0.20 AND ST_REV > 0.20,-10.05003768479959,0.0,characteristic,True,extreme
+ff3,9.321988922122408,0.0,2,2,ST_REV > 0.20 AND r12_2 < -0.20,-9.700118690295206,0.0,characteristic,True,extreme
+ff5_umd,8.3195200406185,0.0,2,1,Resid_Var > 0.20 AND ST_REV > 0.20,-2.711762833722599,0.005,mixed,True,extreme
+linear,7.241335305168146,0.0,3,0,r12_2 < -0.10 AND ST_REV > 0.30 AND BAAFFM < 0.23,-1.9938850224988462,0.0585,state-dependent,False,min_stocks_50
+additive,5.150094362694852,0.002,1,1,Rel2High < -0.10 AND ST_REV > 0.10,-3.050915948869282,0.0025,mixed,True,min_stocks_50
+additive_state,7.461549519879338,0.0,1,1,ST_REV > 0.10 AND Rel2High < -0.10,-7.590963415394693,0.0,mixed,True,min_stocks_50
+cpz_gan_ensemble,5.974845536366852,0.0005,2,0,AT > 0.30 AND CTO > 0.10,-1.3363562208522382,0.971,mixed,False,min_stocks_50
+capm,11.89205295686942,0.0,2,2,ST_REV > 0.10 AND Rel2High < -0.10,-9.84770755622413,0.0,mixed,True,min_stocks_50
+ff3,10.143784849415088,0.0,2,2,ST_REV > 0.10 AND Rel2High < -0.10,-10.317749541959033,0.0,mixed,True,min_stocks_50
+ff5_umd,8.658953462386146,0.0,2,1,Rel2High < -0.10 AND ST_REV > 0.10,-8.46828895152785,0.0,mixed,True,min_stocks_50

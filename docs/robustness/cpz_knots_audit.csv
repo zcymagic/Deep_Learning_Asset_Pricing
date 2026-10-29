@@ -1,0 +1,4 @@
+model,max_abs_t,global_p,n_rules,n_confirmed,top_rule,t_holdout,p_maxt,class,reversal_rule_confirmed
+additive_k5,5.9366768019136815,0.0,1,1,Rel2High < -0.10 AND ST_REV > 0.10,-3.537504631440833,0.0015,mixed,True
+additive_k9,5.150094362694852,0.002,1,1,Rel2High < -0.10 AND ST_REV > 0.30,-2.895378969219175,0.002,mixed,True
+additive_k13,5.15520657529533,0.002,1,1,Rel2High < -0.10 AND ST_REV > 0.30,-2.6551686976752493,0.003,mixed,True

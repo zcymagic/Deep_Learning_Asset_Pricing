@@ -1,0 +1,31 @@
+model,max_abs_t,global_p,n_rules,n_confirmed,top_rule,t_holdout,p_maxt,class,reversal_rule_confirmed,grid
+linear,3.734573378201508,0.0475,2,0,ST_REV > 0.30 AND r12_2 < -0.10,-1.3113828012189184,0.1575,state-dependent,False,baseline
+additive,4.993514038166721,0.002,1,0,ST_REV > 0.30 AND r12_2 < -0.10,-0.8251011523019146,0.224,characteristic,False,baseline
+additive_state,7.313480789521716,0.0,0,0,,,,,False,baseline
+capm,9.640750563786797,0.0,2,2,ST_REV > 0.30 AND Rel2High < -0.10,-9.621276133270204,0.0,mixed,True,baseline
+ff3,10.299256174992554,0.0,5,4,ST_REV > 0.30 AND r12_2 < -0.30,-10.974725152775566,0.0,state-dependent,True,baseline
+ff5_umd,7.034939788465106,0.0,1,1,ST_REV > 0.30 AND Rel2High < -0.10,-8.290005502385059,0.0,mixed,True,baseline
+linear,3.734573378201508,0.0475,1,1,r12_2 < -0.30 AND ST_REV > 0.30,-2.192418053483376,0.006,state-dependent,True,coarse
+additive,4.993514038166721,0.002,1,0,ST_REV > 0.30 AND A2ME > 0.30,0.21638598639244316,0.5905,characteristic,False,coarse
+additive_state,7.313480789521716,0.0,0,0,,,,,False,coarse
+capm,9.640750563786797,0.0,3,2,ST_REV > 0.30 AND r12_2 < -0.30,-10.248760719530736,0.0,state-dependent,True,coarse
+ff3,10.299256174992554,0.0,5,4,ST_REV > 0.30 AND r12_2 < -0.30,-10.974725152775566,0.0,state-dependent,True,coarse
+ff5_umd,7.034939788465106,0.0,3,2,ST_REV > 0.30 AND r12_2 < -0.30,-8.441618218610264,0.0,state-dependent,True,coarse
+linear,4.6291129557118245,0.0065,3,0,LME < -0.40 AND r2_1 < -0.30,2.538496238201117,1.0,mixed,False,fine
+additive,5.2982902052616,0.0025,1,0,r12_2 < -0.10 AND ST_REV > 0.30,-0.8251011523019146,0.224,characteristic,False,fine
+additive_state,7.592159972845711,0.0,0,0,,,,,False,fine
+capm,9.501285539284662,0.0,2,2,ST_REV > 0.30 AND Rel2High < -0.10,-9.621276133270204,0.0,mixed,True,fine
+ff3,11.071733481182287,0.0,2,2,ST_REV > 0.30 AND r12_2 < -0.20,-11.097798904273303,0.0,state-dependent,True,fine
+ff5_umd,7.321494884504749,0.0,2,2,ST_REV > 0.30 AND Rel2High < -0.10,-8.290005502385062,0.0,mixed,True,fine
+linear,4.6291129557118245,0.006,1,1,ST_REV > 0.40 AND r12_2 < -0.20,-3.3975375897872406,0.0,state-dependent,True,extreme
+additive,5.2982902052616,0.0015,1,1,ST_REV > 0.20 AND r12_2 < -0.20,-1.709566789615228,0.034,characteristic,True,extreme
+additive_state,7.592159972845711,0.0,0,0,,,,,False,extreme
+capm,9.501285539284662,0.0,3,2,ST_REV > 0.20 AND r12_2 < -0.40,-7.854724046686915,0.0,characteristic,True,extreme
+ff3,11.071733481182287,0.0,2,2,ST_REV > 0.20 AND r12_2 < -0.20,-10.785395297342287,0.0,state-dependent,True,extreme
+ff5_umd,7.321494884504749,0.0,4,2,ST_REV > 0.20 AND Rel2High < -0.20,-8.196610835912178,0.0,mixed,True,extreme
+linear,3.734573378201508,0.0475,2,0,ST_REV > 0.30 AND r12_2 < -0.10,-1.3113828012189184,0.1575,state-dependent,False,min_stocks_50
+additive,4.993514038166721,0.002,1,0,ST_REV > 0.30 AND r12_2 < -0.10,-0.8251011523019146,0.224,characteristic,False,min_stocks_50
+additive_state,7.313480789521716,0.0,0,0,,,,,False,min_stocks_50
+capm,9.640750563786797,0.0,2,2,ST_REV > 0.10 AND Rel2High < -0.10,-8.528932718412381,0.0,mixed,True,min_stocks_50
+ff3,10.299256174992554,0.0,2,2,ST_REV > 0.30 AND r12_2 < -0.10,-10.295418366266649,0.0,state-dependent,True,min_stocks_50
+ff5_umd,7.034939788465106,0.0,2,2,NI > 0.30 AND NOA > 0.10,-7.7972362944761295,0.0,state-dependent,True,min_stocks_50
