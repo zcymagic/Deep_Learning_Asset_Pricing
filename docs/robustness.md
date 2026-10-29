@@ -47,8 +47,8 @@ rule.
   * the CPZ GAN has no confirmed failure under any grid.
 * **Global tests change little.** The largest hold-out |t| moves by at most 1.5 across grids (CAPM on
   the CPZ panel), and usually by less than 0.9. The ordering of models is unchanged: factor models
-  score 7–12, the additive glass-box SDF 5.0–5.3. Every SDF is rejected under every grid, except the
-  linear SDF on OSAP (p = 0.048 at baseline, 0.006 in the fine grid).
+  score 7–12, the additive glass-box SDF 5.0–5.3. Every SDF is rejected at 5% under every grid. The closest
+  call is the linear SDF on OSAP (p = 0.048 in three grids, 0.006 in the other two).
 * **The failure class is not robust,** as found in the state-variable check. The same reversal rule is
   labelled characteristic, state-dependent or mixed depending on the grid (whether Rel2High or r12_2
   enters, which state cut is available). The economic description should rest on the rule, not on the
