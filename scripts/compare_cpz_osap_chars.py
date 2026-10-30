@@ -25,6 +25,18 @@ UNK = -99.99
 SPLITS = ['train', 'valid', 'test']
 
 
+def match_on_return(C, O, tol):
+	"""Row indices (ic, io) of stocks whose returns (column 0) agree to tol and are unique in both months."""
+	key_c = np.round(C[:, 0].astype(np.float64) / tol).astype(np.int64)
+	key_o = np.round(O[:, 0].astype(np.float64) / tol).astype(np.int64)
+	uc, cc = np.unique(key_c, return_counts=True)
+	uo, co = np.unique(key_o, return_counts=True)
+	good = np.intersect1d(uc[cc == 1], uo[co == 1])
+	ic = np.where(np.isin(key_c, good))[0]
+	io = np.where(np.isin(key_o, good))[0]
+	return ic[np.argsort(key_c[ic])], io[np.argsort(key_o[io])]
+
+
 def load(path):
 	d = np.load(path, allow_pickle=True)
 	return d['data'], d['date'].astype(int), [str(v) for v in d['variable']]
@@ -56,18 +68,11 @@ def main():
 			O = do[pos_o[ym]]
 			O = O[np.isfinite(O[:, 0]) & (O[:, 0] != UNK)]
 			n_cpz += len(C)
-			key_c = np.round(C[:, 0].astype(np.float64) / args.tol).astype(np.int64)
-			key_o = np.round(O[:, 0].astype(np.float64) / args.tol).astype(np.int64)
-			uc, cc = np.unique(key_c, return_counts=True)
-			uo, co = np.unique(key_o, return_counts=True)
-			good = np.intersect1d(uc[cc == 1], uo[co == 1])
-			if len(good) < 30:
+			mc, mo = match_on_return(C, O, args.tol)
+			if len(mc) < 30:
 				continue
-			sel_c = np.isin(key_c, good)
-			sel_o = np.isin(key_o, good)
-			Cm = C[sel_c][np.argsort(key_c[sel_c])]
-			Om = O[sel_o][np.argsort(key_o[sel_o])]
-			n_match += len(good)
+			Cm, Om = C[mc], O[mo]
+			n_match += len(mc)
 			for name, a, b in zip(common, ic, io):
 				x, y = Cm[:, a].astype(np.float64), Om[:, b].astype(np.float64)
 				ok = np.isfinite(y) & (y != 0.0)
