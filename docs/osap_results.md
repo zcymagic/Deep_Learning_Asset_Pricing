@@ -80,6 +80,51 @@ stock by stock over 1967–2016.
   realized variance (0.83) than with OSAP's Corwin–Schultz BidAskSpread (0.65), so it is likely a
   daily-data measure. SUV is a monthly proxy for CPZ's daily volume surprise (0.65).
 
+**Cross-validation against Jensen, Kelly & Pedersen (2023).** Where CPZ and OSAP disagree, the JKP data
+from "Is there a replication crisis in finance?" serve as an independent third construction.
+`scripts/compare_cpz_osap_jkp.py` does the three-way comparison:
+* **Matching.** Stock-months matched between CPZ and OSAP on the return carry OSAP's permno, which joins
+  JKP on permno and month. 98% of the JKP and OSAP excess returns agree to 1e-3, which confirms the join.
+* **Sample.** 105,000 stock-months, every June and December of 1970–2016. JKP's extract starts in 1970.
+* **Measure.** Mean monthly rank correlation with JKP's characteristic of the same definition. Where JKP
+  has none, the closest JKP characteristic is used.
+* **Tables:** [`osap_results/char_crossvalidation_jkp.csv`](osap_results/char_crossvalidation_jkp.csv)
+  (per characteristic) and `char_crossvalidation_jkp_full.csv` (against all 405 JKP characteristics).
+
+| finding | characteristic: ρ(CPZ, JKP) / ρ(OSAP, JKP), with JKP's version |
+|---|---|
+| all three agree (≥ 0.97) | past returns (except r2_1, which JKP lacks, and r12_7), LME, AT, Beta (the Frazzini–Pedersen beta) |
+| **OSAP agrees with JKP, CPZ deviates** | IdioVol 0.62 / 0.99 (ivol_ff3_21d), Variance 0.88 / 1.00 (rvol_21d), Spread 0.66 / 1.00 (bidaskhl_21d), NI 0.48 / 1.00 (chcsho_12m), D2P 0.69 / 0.98, A2ME 0.83 / 0.98, S2P 0.88 / 0.98, PROF 0.65 / 0.93 (gp_at) |
+| **CPZ agrees with JKP, OSAP deviates** | Rel2High 0.98 / 0.85 (prc_highprc_252d), Lev 0.88 / 0.66 (debt_be), PM 0.87 / 0.76 (ebit_sale), RNA 0.76 / 0.60 (ebit_bev), and less clearly MktBeta 0.98 / 0.88 (beta_60m) |
+| agree within 0.10, moderate levels | BEME, C, E2P, ATO, CTO, OP, ROA, ROE, NOA, DPI2A, Resid_Var, LTurnover, OL |
+| no source matches JKP | CF, CF2P, AC, OA, D2A, SUV, Investment (0.47 / 0.54 with at_gr1) |
+
+* **Neither panel is uniformly "correct".**
+  * For trading characteristics built from daily data, OSAP reproduces the standard construction almost
+    exactly. CPZ's versions differ.
+    * CPZ's `Spread` behaves like a volatility measure: 0.84 with 21-day return volatility, against 0.66
+      with the Corwin–Schultz spread.
+    * CPZ's `IdioVol` is closest to a one-year rather than a one-month idiosyncratic volatility (0.75).
+    * CPZ's `NI` is not twelve-month share growth.
+  * The lower agreement for CPZ's price-scaled ratios (A2ME, S2P, D2P) points to a different market-equity
+    date in CPZ.
+  * So where these OSAP characteristics differ from CPZ, it is CPZ that departs from the standard
+    definition; OSAP is not wrong.
+* **Four OSAP mappings depart from the standard and could be improved.**
+  * `Rel2High`: OSAP's High52 is not the daily 52-week-high ratio. CPZ and JKP agree at 0.98. This
+    characteristic enters the reversal rules.
+  * `Lev`: OSAP's Leverage is market leverage (0.90 with JKP at_me), whereas CPZ's is book leverage. OSAP's
+    BookLeverage signal would be closer.
+  * `PM` and `RNA`: OSAP's PM and RetNOA are further from JKP's than CPZ's are.
+* **Accounting characteristics agree only moderately everywhere (0.6–0.9).** JKP update accounting data
+  with a shorter lag and use quarterly data where available, so timing differences cap these
+  correlations. For accruals, cash flow, depreciation and investment, no two sources agree. JKP has no
+  exact counterpart to CPZ's definitions, so only a Compustat rebuild (`scripts/wrds_export_funda.sas`)
+  can settle them.
+* **For this project.** OSAP replicates CPZ for the characteristics behind the main findings: ST_REV and
+  r12_2 at 0.99, and the value measures at 0.79–0.98. Rel2High is the one exception, and there CPZ is
+  the better-built panel. Since the reversal results hold on both panels, they do not hinge on it.
+
 **Missing values.** Requiring every characteristic, as CPZ do, keeps only 17% of stock-months. OSAP's
 `OperProf` covers about 40% of stocks, `EP` about 60%, and `Cash` and quarterly `roaq` start only in
 1971–72. The main panel therefore follows Gu, Kelly & Xiu (2020): it keeps stock-months with at least

@@ -20,10 +20,12 @@ For every CPZ characteristic the table gives
 	cpz_jkp       rho(CPZ, JKP)       osap_jkp  rho(OSAP, JKP)       cpz_osap  rho(CPZ, OSAP)
 	cpz_best      the JKP characteristic closest to CPZ's, and its rho; osap_best likewise for OSAP
 	verdict       which source agrees with JKP (difference of at least 0.10), otherwise 'agree' or 'all differ'
+char_crossvalidation_jkp_full.csv holds rho of every CPZ and OSAP characteristic with every JKP characteristic.
 """
 import argparse
 import os
 import sys
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -34,7 +36,7 @@ from compare_cpz_osap_chars import UNK, SPLITS, load, match_on_return
 # JKP counterpart by definition (None: no clean counterpart; the best-matching JKP characteristic is used)
 DESIGNATED = {
 	'ST_REV': 'ret_1_0', 'r2_1': None, 'r12_2': 'ret_12_1', 'r12_7': 'ret_12_7', 'r36_13': 'ret_36_12',
-	'LT_Rev': 'ret_60_12', 'LME': 'market_equity', 'AT': 'assets', 'Beta': 'beta_60m', 'MktBeta': None,
+	'LT_Rev': 'ret_60_12', 'LME': 'market_equity', 'AT': 'assets', 'Beta': 'betabab_1260d', 'MktBeta': 'beta_60m',
 	'IdioVol': 'ivol_ff3_21d', 'Resid_Var': None, 'Variance': 'rvol_21d', 'Spread': 'bidaskhl_21d',
 	'Rel2High': 'prc_highprc_252d', 'LTurnover': 'turnover_126d', 'SUV': None,
 	'A2ME': 'at_me', 'BEME': 'be_me', 'C': 'cash_at', 'CF': 'fcf_be', 'CF2P': 'ocf_me', 'D2P': 'div12m_me',
@@ -72,6 +74,7 @@ def rank_corr(rx, RY):
 
 
 def main():
+	warnings.filterwarnings('ignore', 'Mean of empty slice')
 	ap = argparse.ArgumentParser()
 	ap.add_argument('--cpz', default='datasets/char')
 	ap.add_argument('--osap', default='datasets/osap')
@@ -151,6 +154,9 @@ def main():
 	df = df.sort_values('order').drop(columns='order')
 	os.makedirs(args.out, exist_ok=True)
 	df.to_csv(os.path.join(args.out, 'char_crossvalidation_jkp.csv'), index=False)
+	full = pd.concat({src: pd.DataFrame({name: np.nanmean(np.array(d[src]), axis=0) for name, d in acc.items()}, index=jv).T
+		for src in ('cpz', 'osap')}, names=['source', 'characteristic'])
+	full.round(3).to_csv(os.path.join(args.out, 'char_crossvalidation_jkp_full.csv'))
 	print('three-way matched stock-months %d' % n_three)
 	print(df.round(2).to_string(index=False))
 
