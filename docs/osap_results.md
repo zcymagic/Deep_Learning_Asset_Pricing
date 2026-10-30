@@ -37,8 +37,48 @@ CPZ-panel results: [cpz_results.md](cpz_results.md). Supporting tables: [`osap_r
   volume-surprise proxy (`SUV`), and split-adjusted one-year share issuance (`NI`);
 * **from OSAP:** the rest, mapped by economic category. The mapping is in `osap_results/build_meta.json`.
   Several mappings are approximate: `Resid_Var` ← IdioVolAHT, `D2A` ← depreciation/PPE,
-  `OA` ← percent operating accruals, `CF`/`CF2P` ← OSAP's two cash-flow-to-price measures;
+  `OA` ← percent operating accruals, `CF2P` ← OSAP CF (cash flow to market), `CF` ← OSAP cfp;
 * **no counterpart:** Q, SGA2S, FC2Y, PCM.
+
+**Consistency with the CPZ characteristics.** `scripts/compare_cpz_osap_chars.py` compares the two panels
+stock by stock over 1967–2016.
+* **Matching.** The CPZ files have no stock identifiers, so stocks are matched within each month on the
+  excess return. A match requires agreement to 1e-5 and a return that is unique in both panels. That
+  matches 651,000 of CPZ's 1.22 million stock-months (53%). Most of the rest fail the uniqueness
+  requirement or differ by a few 1e-5, from rounding or a slightly different
+  risk-free rate. 97–98% of CPZ returns have an OSAP return within 1e-4.
+* **Measure.** Both panels hold ranks over different universes, so each characteristic is compared by
+  its monthly Spearman correlation on the matched stocks. Median-imputed OSAP cells are left out.
+* **Table:** [`osap_results/char_consistency.csv`](osap_results/char_consistency.csv).
+
+| agreement (mean monthly Spearman) | characteristics |
+|---|---|
+| ≥ 0.97 | the six past-return characteristics, LME, LTurnover, AT, OL, Beta |
+| 0.80–0.91 | DPI2A, Investment, CTO, S2P, OP, Variance, ATO, MktBeta, A2ME, BEME, E2P, Resid_Var, ROE, Rel2High, PM, C |
+| 0.60–0.80 | NOA, CF2P, RNA, PROF, D2P, Lev, Spread, SUV, IdioVol, ROA |
+| < 0.60 | NI (0.53), AC (0.32), OA (0.21), CF (0.18), D2A (0.16) |
+
+* **Two mapping errors, fixed.** The comparison found them in the first build:
+  * `Beta` and `MktBeta` were swapped. CPZ's `Beta` matches OSAP BetaFP at 0.99; CPZ's `MktBeta`
+    matches OSAP Beta at 0.86.
+  * CPZ's `CF2P` matches OSAP's CF signal (0.78), not cfp (0.26).
+
+  Both fixes only rename columns. `CF` and `CF2P` are both in the value group, and neither beta is in
+  a group or on the friction list. So every fitted number in this document is unchanged; the tables in
+  `osap_results/` and `robustness/osap_*` carry the corrected names.
+* **The main findings rest on well-matched characteristics.**
+  * The reversal rules use ST_REV and r12_2 (0.99) and Rel2High (0.83).
+  * Value-group members agree at 0.78–0.90, except CF (0.18) and D2P (0.69).
+  * Idiosyncratic volatility, identified in Paper 2 below, matches at 0.62 (IdioVol) and 0.83 (Resid_Var).
+* **Five characteristics are different signals, not proxies:** NI, AC, OA, CF and D2A. Results naming
+  them describe the OSAP signal, not CPZ's characteristic.
+  * NI: CPZ's definition differs from split-adjusted one-year share growth.
+  * The other four: OSAP's accruals, cash-flow and depreciation measures use other numerators or
+    scalings.
+  * Rebuilding them to CPZ's definitions would need Compustat annual data.
+* **Spread is a different measure, and SUV is a monthly proxy.** CPZ's `Spread` agrees more with
+  realized variance (0.83) than with OSAP's Corwin–Schultz BidAskSpread (0.65), so it is likely a
+  daily-data measure. SUV is a monthly proxy for CPZ's daily volume surprise (0.65).
 
 **Missing values.** Requiring every characteristic, as CPZ do, keeps only 17% of stock-months. OSAP's
 `OperProf` covers about 40% of stocks, `EP` about 60%, and `Cash` and quarterly `roaq` start only in
@@ -169,7 +209,7 @@ investment (DPI2A), operating leverage, idiosyncratic volatility, share issuance
 | **short-term reversal** | 0.06 | ✓ / ✓ / ✗ / ✓ | at every ε and bootstrap (negative) |
 | idiosyncratic volatility | 0.07 | ✓ / ✓ / ✗ / ✓ | ε = 0.2% and bootstrap (negative) |
 | Resid_Var | 0.06 | ✓ / ✓ / ✗ / ✓ | — |
-| cash flow (CF) | 0.06 | ✓ / ✓ / ✗ / ✗ | — |
+| cash flow to price (CF2P) | 0.06 | ✓ / ✓ / ✗ / ✗ | — |
 | size (LME), assets (AT), ROA, NI | < 0.05 | partly | ε ≤ 1% and bootstrap |
 
 * **The two CPZ-panel conclusions replicate:**
