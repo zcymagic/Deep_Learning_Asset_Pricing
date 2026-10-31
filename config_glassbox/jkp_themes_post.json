@@ -1,0 +1,103 @@
+{
+	"individual_feature_file": "datasets/jkp_themes/Char_train.npz",
+	"individual_feature_file_valid": "datasets/jkp_themes/Char_valid.npz",
+	"individual_feature_file_test": "datasets/jkp_themes/Char_post.npz",
+	"macro_feature_file": "datasets/jkp_themes/macro_train.npz",
+	"macro_feature_file_valid": "datasets/jkp_themes/macro_valid.npz",
+	"macro_feature_file_test": "datasets/jkp_themes/macro_post.npz",
+	"macro_idx": null,
+	"state_vars": [
+		"dfy",
+		"tms",
+		"svar"
+	],
+	"audit_state_vars": [
+		"dfy",
+		"tms",
+		"svar",
+		"tbl",
+		"d/p",
+		"ntis",
+		"infl",
+		"b/m"
+	],
+	"lta_chars": [
+		"Size"
+	],
+	"value_group": [
+		"Value"
+	],
+	"train": {
+		"epochs_unc": 256,
+		"epochs_moment": 64,
+		"epochs_cond": 1024,
+		"lr": 0.001,
+		"eval_every": 8
+	},
+	"ladder": {
+		"n_seeds": 9,
+		"n_pairs": 5,
+		"neural_hidden": [
+			64,
+			64
+		]
+	},
+	"audit": {
+		"beam": 40,
+		"top": 15,
+		"n_boot": 2000,
+		"min_stocks": 30
+	},
+	"rashomon": {
+		"rung": "additive",
+		"eps_grid": [
+			0.002,
+			0.01,
+			0.05
+		],
+		"n_boot": 200,
+		"lam_smooth": 0.001,
+		"shrink_grid": [
+			0.0,
+			0.0001,
+			0.001,
+			0.01,
+			0.1,
+			1.0,
+			10.0,
+			100.0
+		]
+	},
+	"external_sdfs": {},
+	"factor_files": {
+		"capm": {
+			"path": "datasets/factors/ff5_umd_osap_post.csv",
+			"date_col": "date",
+			"columns": [
+				"Mkt-RF"
+			]
+		},
+		"ff3": {
+			"path": "datasets/factors/ff5_umd_osap_post.csv",
+			"date_col": "date",
+			"columns": [
+				"Mkt-RF",
+				"SMB",
+				"HML"
+			]
+		},
+		"ff5_umd": {
+			"path": "datasets/factors/ff5_umd_osap_post.csv",
+			"date_col": "date",
+			"columns": [
+				"Mkt-RF",
+				"SMB",
+				"HML",
+				"RMW",
+				"CMA",
+				"UMD"
+			]
+		}
+	},
+	"_comment": "JKP theme panel: the 153 JKP characteristics collapsed to their 13 themes (signed by JKP direction, averaged, re-ranked), built by scripts/build_jkp_theme_panel.py from datasets/jkp_panel. Same splits and settings as config_glassbox/jkp_post.json. lta_chars: the Size theme (market equity, price, dollar volume, Amihud illiquidity). Low Risk mixes volatility and liquidity, so it is left out."
+}
