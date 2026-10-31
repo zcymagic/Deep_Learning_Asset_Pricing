@@ -1,0 +1,2 @@
+description,t_discovery,t_stepwise,alpha,alpha_when_active,share_active,avg_stocks,t_holdout,alpha_holdout,p_holdout,p_holm,p_maxt,share_active_holdout,t_holdout_stepwise,p_holdout_stepwise,state_dep_var,t_state_dep,class
+corr_1260d < -0.10 AND qmj_growth > 0.30,-5.578289097716559,-5.610405305110351,-0.01181833281501239,-0.01181833281501239,1.0,142.40196078431373,2.5097186080289955,0.004364091844397637,0.9939586299174934,0.9939586299174934,0.9815,1.0,2.5097186080289955,0.9939586299174934,tms,-1.9560631410706417,characteristic

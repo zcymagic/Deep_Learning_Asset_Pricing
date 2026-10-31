@@ -6,6 +6,7 @@ used for two things:
 2. a **true out-of-sample test** on 2017–2024, after CPZ was first circulated in 2019.
 
 CPZ-panel results: [cpz_results.md](cpz_results.md). Supporting tables: [`osap_results/`](osap_results/).
+Results on the 153 Jensen–Kelly–Pedersen characteristics and their 13 themes: [jkp_results.md](jkp_results.md).
 
 ## Panel construction
 

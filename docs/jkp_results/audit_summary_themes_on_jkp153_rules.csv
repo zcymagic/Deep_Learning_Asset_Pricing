@@ -1,0 +1,4 @@
+model,holdout_max_abs_t,holdout_global_p,holdout_rms_alpha,n_rules_discovered,n_sig_limits-to-arbitrage,share_limits-to-arbitrage,n_sig_state-dependent,share_state-dependent,n_sig_characteristic,share_characteristic,n_sig_mixed,share_mixed
+linear,6.3041828004530265,0.0,0.003235363811036551,1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+additive,4.992793570247871,0.006,0.002795301421249,1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+additive_state,8.176377352592098,0.0,0.0031026362251116,2,0.0,0.0,0.0,0.0,1.0,1.0,0.0,0.0

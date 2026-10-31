@@ -1,0 +1,2 @@
+description,t_discovery,t_stepwise,alpha,alpha_when_active,share_active,avg_stocks,t_holdout,alpha_holdout,p_holdout,p_holm,p_maxt,share_active_holdout,t_holdout_stepwise,p_holdout_stepwise,state_dep_var,t_state_dep,class
+Momentum < -0.10 AND Short-Term Reversal < -0.30,-5.10300896306535,-5.090033119653111,-0.00978150453652335,-0.00978150453652335,1.0,250.99019607843138,-1.4142882943225445,-0.003635014204624624,0.07863863624478673,0.07863863624478673,0.086,1.0,-1.4142882943225445,0.07863863624478673,dfy,1.9622077734282373,characteristic
