@@ -6,6 +6,7 @@ Input: JKP's US stock-month file. One row per stock-month: date, id (CRSP permno
 return (ret_exc) and characteristics lagged one month (suffix _l, known at the end of the previous
 month), already ranked cross-sectionally to [-1, 1] with missing values set to 0. Same timing as CPZ.
 
+Universe: CRSP securities only (id <= 99999); JKP's file also holds Compustat-only securities.
 Characteristics: the 153 of JKP's paper (JKP153, grouped into their 13 themes in glassbox/jkp_themes.py).
 Stock-months need at least --min_observed of them observed (non-zero). Each month every characteristic
 is re-ranked among the kept stocks with an observed value to [-0.5, 0.5] (CPZ scaling); missing values
@@ -86,7 +87,9 @@ def main():
 		if args.cache:
 			np.savez(args.cache, ym=ym, ids=ids, ret=ret, X=X)
 	n_raw = len(ym)
-	keep = (np.nan_to_num(X) != 0).mean(1) >= args.min_observed
+	# CRSP securities only (permnos have at most 5 digits): JKP's US file also holds Compustat-only
+	# securities, whose Compustat-based returns are unreliable (monthly sd about 60 against 0.19 for CRSP)
+	keep = (ids <= 99999) & ((np.nan_to_num(X) != 0).mean(1) >= args.min_observed)
 	ym, ids, ret, X = ym[keep], ids[keep], ret[keep], X[keep]
 	_, first = np.unique(ids * 1000000 + ym, return_index=True)		# one row per stock-month
 	ym, ids, ret, X = ym[first], ids[first], ret[first], X[first]
