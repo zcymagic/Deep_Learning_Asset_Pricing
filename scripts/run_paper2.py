@@ -51,7 +51,10 @@ def main():
 	state_vars = cfg['state_vars']
 	os.makedirs(args.out, exist_ok=True)
 	names = train.char_names
-	groups = {'value': [c for c in cfg.get('value_group', []) if c in names]} if cfg.get('value_group') else None
+	groups = {'value': [c for c in cfg.get('value_group', []) if c in names]} if cfg.get('value_group') else {}
+	for label, members in cfg.get('feature_groups', {}).items():		# e.g. JKP themes
+		groups[label] = [c for c in members if c in names]
+	groups = groups or None
 
 	# 1. fit
 	rung = args.rung or rc.get('rung', 'additive_state')

@@ -1,0 +1,311 @@
+{
+	"individual_feature_file": "datasets/jkp_panel/Char_train.npz",
+	"individual_feature_file_valid": "datasets/jkp_panel/Char_valid.npz",
+	"individual_feature_file_test": "datasets/jkp_panel/Char_test.npz",
+	"macro_feature_file": "datasets/jkp_panel/macro_train.npz",
+	"macro_feature_file_valid": "datasets/jkp_panel/macro_valid.npz",
+	"macro_feature_file_test": "datasets/jkp_panel/macro_test.npz",
+	"macro_idx": null,
+	"state_vars": [
+		"dfy",
+		"tms",
+		"svar"
+	],
+	"audit_state_vars": [
+		"dfy",
+		"tms",
+		"svar",
+		"tbl",
+		"d/p",
+		"ntis",
+		"infl",
+		"b/m"
+	],
+	"lta_chars": [
+		"market_equity",
+		"prc",
+		"ami_126d",
+		"dolvol_126d",
+		"bidaskhl_21d",
+		"turnover_126d",
+		"zero_trades_21d",
+		"zero_trades_126d",
+		"zero_trades_252d",
+		"ivol_capm_21d",
+		"ivol_ff3_21d",
+		"ivol_hxz4_21d",
+		"ivol_capm_252d",
+		"rvol_21d",
+		"prc_highprc_252d"
+	],
+	"value_group": [
+		"at_me",
+		"be_me",
+		"bev_mev",
+		"debt_me",
+		"div12m_me",
+		"ebitda_mev",
+		"eq_dur",
+		"eqnpo_me",
+		"eqpo_me",
+		"fcf_me",
+		"ival_me",
+		"ni_me",
+		"ocf_me",
+		"sale_me"
+	],
+	"train": {
+		"epochs_unc": 256,
+		"epochs_moment": 64,
+		"epochs_cond": 1024,
+		"lr": 0.001,
+		"eval_every": 8
+	},
+	"ladder": {
+		"n_seeds": 9,
+		"n_pairs": 5,
+		"neural_hidden": [
+			64,
+			64
+		]
+	},
+	"audit": {
+		"beam": 40,
+		"top": 15,
+		"n_boot": 2000,
+		"min_stocks": 30
+	},
+	"rashomon": {
+		"rung": "additive",
+		"eps_grid": [
+			0.002,
+			0.01,
+			0.05
+		],
+		"n_boot": 200,
+		"lam_smooth": 0.001,
+		"shrink_grid": [
+			0.0,
+			0.0001,
+			0.001,
+			0.01,
+			0.1,
+			1.0,
+			10.0,
+			100.0
+		]
+	},
+	"external_sdfs": {},
+	"factor_files": {
+		"capm": {
+			"path": "datasets/factors/ff5_umd_osap.csv",
+			"date_col": "date",
+			"columns": [
+				"Mkt-RF"
+			]
+		},
+		"ff3": {
+			"path": "datasets/factors/ff5_umd_osap.csv",
+			"date_col": "date",
+			"columns": [
+				"Mkt-RF",
+				"SMB",
+				"HML"
+			]
+		},
+		"ff5_umd": {
+			"path": "datasets/factors/ff5_umd_osap.csv",
+			"date_col": "date",
+			"columns": [
+				"Mkt-RF",
+				"SMB",
+				"HML",
+				"RMW",
+				"CMA",
+				"UMD"
+			]
+		}
+	},
+	"_comment": "Jensen-Kelly-Pedersen panel: their 153 characteristics, built by scripts/build_jkp_panel.py (median imputation, at least 2/3 observed). Splits as the OSAP panel but training starts in 1970 (JKP file start); test 1992-2016. lta_chars: size, price, liquidity, trading-activity and volatility characteristics plus the 52-week-high ratio (the CPZ friction list in JKP terms). value_group: JKP Value theme without its net-issuance measures.",
+	"feature_groups": {
+		"theme:Low Leverage": [
+			"age",
+			"aliq_mat",
+			"at_be",
+			"bidaskhl_21d",
+			"cash_at",
+			"netdebt_me",
+			"ni_ivol",
+			"rd_sale",
+			"rd5_at",
+			"tangibility",
+			"z_score"
+		],
+		"theme:Investment": [
+			"aliq_at",
+			"at_gr1",
+			"be_gr1a",
+			"capx_gr1",
+			"capx_gr2",
+			"capx_gr3",
+			"coa_gr1a",
+			"col_gr1a",
+			"emp_gr1",
+			"inv_gr1",
+			"inv_gr1a",
+			"lnoa_gr1a",
+			"mispricing_mgmt",
+			"ncoa_gr1a",
+			"nncoa_gr1a",
+			"noa_gr1a",
+			"ppeinv_gr1a",
+			"ret_60_12",
+			"sale_gr1",
+			"sale_gr3",
+			"saleq_gr1",
+			"seas_2_5na"
+		],
+		"theme:Size": [
+			"ami_126d",
+			"dolvol_126d",
+			"market_equity",
+			"prc",
+			"rd_me"
+		],
+		"theme:Value": [
+			"at_me",
+			"be_me",
+			"bev_mev",
+			"chcsho_12m",
+			"debt_me",
+			"div12m_me",
+			"ebitda_mev",
+			"eq_dur",
+			"eqnetis_at",
+			"eqnpo_12m",
+			"eqnpo_me",
+			"eqpo_me",
+			"fcf_me",
+			"ival_me",
+			"netis_at",
+			"ni_me",
+			"ocf_me",
+			"sale_me"
+		],
+		"theme:Quality": [
+			"at_turnover",
+			"cop_at",
+			"cop_atl1",
+			"dgp_dsale",
+			"gp_at",
+			"gp_atl1",
+			"mispricing_perf",
+			"ni_inc8q",
+			"niq_at",
+			"op_at",
+			"op_atl1",
+			"opex_at",
+			"qmj",
+			"qmj_growth",
+			"qmj_prof",
+			"qmj_safety",
+			"sale_bev"
+		],
+		"theme:Low Risk": [
+			"beta_60m",
+			"beta_dimson_21d",
+			"betabab_1260d",
+			"betadown_252d",
+			"earnings_variability",
+			"ivol_capm_21d",
+			"ivol_capm_252d",
+			"ivol_ff3_21d",
+			"ivol_hxz4_21d",
+			"ocfq_saleq_std",
+			"rmax1_21d",
+			"rmax5_21d",
+			"rvol_21d",
+			"seas_6_10na",
+			"turnover_126d",
+			"zero_trades_126d",
+			"zero_trades_21d",
+			"zero_trades_252d"
+		],
+		"theme:Debt Issuance": [
+			"capex_abn",
+			"debt_gr3",
+			"fnl_gr1a",
+			"ncol_gr1a",
+			"nfna_gr1a",
+			"ni_ar1",
+			"noa_at"
+		],
+		"theme:Seasonality": [
+			"corr_1260d",
+			"coskew_21d",
+			"dbnetis_at",
+			"kz_index",
+			"lti_gr1a",
+			"pi_nix",
+			"seas_11_15an",
+			"seas_11_15na",
+			"seas_16_20an",
+			"seas_2_5an",
+			"seas_6_10an",
+			"sti_gr1a"
+		],
+		"theme:Accruals": [
+			"cowc_gr1a",
+			"oaccruals_at",
+			"oaccruals_ni",
+			"seas_16_20na",
+			"taccruals_at",
+			"taccruals_ni"
+		],
+		"theme:Profitability": [
+			"dolvol_var_126d",
+			"ebit_bev",
+			"ebit_sale",
+			"f_score",
+			"ni_be",
+			"niq_be",
+			"o_score",
+			"ocf_at",
+			"ope_be",
+			"ope_bel1",
+			"turnover_var_126d"
+		],
+		"theme:Profit Growth": [
+			"dsale_dinv",
+			"dsale_drec",
+			"dsale_dsga",
+			"niq_at_chg1",
+			"niq_be_chg1",
+			"niq_su",
+			"ocf_at_chg1",
+			"ret_12_7",
+			"sale_emp_gr1",
+			"saleq_su",
+			"seas_1_1an",
+			"tax_gr1a"
+		],
+		"theme:Short-Term Reversal": [
+			"iskew_capm_21d",
+			"iskew_ff3_21d",
+			"iskew_hxz4_21d",
+			"ret_1_0",
+			"rmax5_rvol_21d",
+			"rskew_21d"
+		],
+		"theme:Momentum": [
+			"prc_highprc_252d",
+			"resff3_12_1",
+			"resff3_6_1",
+			"ret_12_1",
+			"ret_3_1",
+			"ret_6_1",
+			"ret_9_1",
+			"seas_1_1na"
+		]
+	}
+}
