@@ -126,7 +126,7 @@
 			]
 		}
 	},
-	"_comment": "Jensen-Kelly-Pedersen panel: their 153 characteristics, built by scripts/build_jkp_panel.py (median imputation, at least 2/3 observed). Splits as the OSAP panel but training starts in 1970 (JKP file start); test 2017-2024 (post). lta_chars: size, price, liquidity, trading-activity and volatility characteristics plus the 52-week-high ratio (the CPZ friction list in JKP terms). value_group: JKP Value theme without its net-issuance measures.",
+	"_comment": "Jensen-Kelly-Pedersen panel: their 153 characteristics, built by scripts/build_jkp_panel.py (median imputation, at least 2/3 observed). Splits as the OSAP panel but training starts in 1970 (JKP file start); test 2017-2024 (post). lta_chars: size, price, liquidity, trading-activity and volatility characteristics plus the 52-week-high ratio (the CPZ friction list in JKP terms). value_group: JKP Value theme without its net-issuance measures. state_clip 3: standardized state variables clipped at +/-3 training sd (svar reaches 50 sd in October 1987, in the validation split, which derailed the state-varying rungs).",
 	"feature_groups": {
 		"theme:Low Leverage": [
 			"age",
@@ -307,5 +307,6 @@
 			"ret_9_1",
 			"seas_1_1na"
 		]
-	}
+	},
+	"state_clip": 3.0
 }

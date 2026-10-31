@@ -99,5 +99,6 @@
 			]
 		}
 	},
-	"_comment": "JKP theme panel: the 153 JKP characteristics collapsed to their 13 themes (signed by JKP direction, averaged, re-ranked), built by scripts/build_jkp_theme_panel.py from datasets/jkp_panel. Same splits and settings as config_glassbox/jkp_post.json. lta_chars: the Size theme (market equity, price, dollar volume, Amihud illiquidity). Low Risk mixes volatility and liquidity, so it is left out."
+	"_comment": "JKP theme panel: the 153 JKP characteristics collapsed to their 13 themes (signed by JKP direction, averaged, re-ranked), built by scripts/build_jkp_theme_panel.py from datasets/jkp_panel. Same splits and settings as config_glassbox/jkp_post.json. lta_chars: the Size theme (market equity, price, dollar volume, Amihud illiquidity). Low Risk mixes volatility and liquidity, so it is left out. state_clip 3: standardized state variables clipped at +/-3 training sd (svar reaches 50 sd in October 1987, in the validation split, which derailed the state-varying rungs).",
+	"state_clip": 3.0
 }
