@@ -35,26 +35,27 @@ SPLITS = {'train': (197001, 198612), 'valid': (198701, 199112), 'test': (199201,
 
 
 def read_jkp(stream, start, chunksize):
+	"""Stream the CSV; return month (yyyymm), permno, excess return and the 153 characteristics (float32)."""
 	cols = ['date', 'id', 'ret_exc'] + [c + '_l' for c in JKP153]
-	parts, n = [], 0
+	yms, ids, rets, blocks, n = [], [], [], [], 0
 	for chunk in pd.read_csv(stream, usecols=cols, chunksize=chunksize,
 			dtype={c + '_l': np.float32 for c in JKP153}):
 		n += len(chunk)
-		chunk['yyyymm'] = (chunk['date'] // 100).astype(np.int64)
-		chunk = chunk[(chunk['yyyymm'] >= start) & chunk['ret_exc'].notna()]
-		parts.append(chunk.drop(columns='date'))
+		ym = (chunk['date'].values // 100).astype(np.int64)
+		keep = (ym >= start) & chunk['ret_exc'].notna().values
+		yms.append(ym[keep])
+		ids.append(chunk['id'].values[keep].astype(np.int64))
+		rets.append(chunk['ret_exc'].values[keep].astype(np.float32))
+		blocks.append(chunk[[c + '_l' for c in JKP153]].values[keep])
 		print('read %d rows' % n, file=sys.stderr, flush=True)
-	df = pd.concat(parts, ignore_index=True)
-	return df.rename(columns={c + '_l': c for c in JKP153})
+	return np.concatenate(yms), np.concatenate(ids), np.concatenate(rets), np.concatenate(blocks)
 
 
-def rerank(df):
+def rerank(ym, X):
 	"""Re-rank each characteristic within month among observed (non-zero, finite) values to [-0.5, 0.5]."""
-	X = df[JKP153].values.astype(np.float32)
 	X[~np.isfinite(X)] = 0.0
-	order = np.argsort(df['yyyymm'].values, kind='stable')
-	ym = df['yyyymm'].values[order]
-	bounds = np.flatnonzero(np.diff(ym)) + 1
+	order = np.argsort(ym, kind='stable')
+	bounds = np.flatnonzero(np.diff(ym[order])) + 1
 	for rows in np.split(order, bounds):
 		B = X[rows]
 		for k in range(B.shape[1]):
@@ -63,8 +64,7 @@ def rerank(df):
 			if n > 1:
 				B[obs, k] = (rankdata(B[obs, k]) - 1) / (n - 1) - 0.5
 		X[rows] = B
-	df[JKP153] = X
-	return df
+	return X
 
 
 def main():
@@ -74,16 +74,24 @@ def main():
 	ap.add_argument('--macro_dir', default='datasets/osap')
 	ap.add_argument('--min_observed', type=float, default=2 / 3)
 	ap.add_argument('--chunksize', type=int, default=200000)
+	ap.add_argument('--cache', default=None, help='npz of the raw extract: written after streaming, read instead of stdin if present')
 	args = ap.parse_args()
 	os.makedirs(args.out, exist_ok=True)
 
-	df = read_jkp(sys.stdin, SPLITS['train'][0], args.chunksize)
-	n_raw = len(df)
-	obs_share = (df[JKP153].fillna(0).values != 0).mean(1)
-	df = df[obs_share >= args.min_observed].reset_index(drop=True)
-	df = df.drop_duplicates(['id', 'yyyymm'])
-	print('kept %d of %d stock-months with >= %.2f observed' % (len(df), n_raw, args.min_observed), file=sys.stderr)
-	df = rerank(df)
+	if args.cache and os.path.exists(args.cache):
+		c = np.load(args.cache)
+		ym, ids, ret, X = c['ym'], c['ids'], c['ret'], c['X']
+	else:
+		ym, ids, ret, X = read_jkp(sys.stdin, SPLITS['train'][0], args.chunksize)
+		if args.cache:
+			np.savez(args.cache, ym=ym, ids=ids, ret=ret, X=X)
+	n_raw = len(ym)
+	keep = (np.nan_to_num(X) != 0).mean(1) >= args.min_observed
+	ym, ids, ret, X = ym[keep], ids[keep], ret[keep], X[keep]
+	_, first = np.unique(ids * 1000000 + ym, return_index=True)		# one row per stock-month
+	ym, ids, ret, X = ym[first], ids[first], ret[first], X[first]
+	print('kept %d of %d stock-months with >= %.2f observed' % (len(ym), n_raw, args.min_observed), file=sys.stderr)
+	X = rerank(ym, X)
 
 	fac = pd.concat([pd.read_csv(f) for f in args.factors]).drop_duplicates('date')
 	date_of = dict(zip(fac['date'].astype(int) // 100, fac['date'].astype(int)))
@@ -93,30 +101,30 @@ def main():
 		index=np.concatenate([m['date'] for m in mac_parts]).astype(int) // 100)
 
 	meta = {'source': 'Jensen, Kelly & Pedersen (2023) US characteristics', 'characteristics': JKP153,
-		'min_observed': args.min_observed, 'stock_months_raw': int(n_raw), 'stock_months_kept': int(len(df)), 'splits': {}}
-	last = int(df['yyyymm'].max())
+		'min_observed': args.min_observed, 'stock_months_raw': int(n_raw), 'stock_months_kept': int(len(ym)), 'splits': {}}
+	last = int(ym.max())
 	for name, (lo, hi) in SPLITS.items():
 		hi = min(hi, last)
-		sub = df[(df['yyyymm'] >= lo) & (df['yyyymm'] <= hi)]
-		months = sorted(m for m in sub['yyyymm'].unique() if m in date_of)
-		if not months:
+		sel = (ym >= lo) & (ym <= hi) & np.isin(ym, list(date_of))
+		if not sel.any():
 			continue
-		sub = sub[sub['yyyymm'].isin(months)]
-		permnos = np.sort(sub['id'].unique())
-		ti = pd.Index(months).get_indexer(sub['yyyymm'])
-		ii = pd.Index(permnos).get_indexer(sub['id'])
+		months = np.unique(ym[sel])
+		permnos = np.unique(ids[sel])
+		ti = np.searchsorted(months, ym[sel])
+		ii = np.searchsorted(permnos, ids[sel])
 		data = np.full((len(months), len(permnos), 1 + len(JKP153)), UNK, dtype=np.float32)
-		data[ti, ii, 0] = sub['ret_exc'].values
-		data[ti, ii, 1:] = sub[JKP153].values
+		data[ti, ii, 0] = ret[sel]
+		data[ti, ii, 1:] = X[sel]
 		dates = np.array([date_of[m] for m in months])
 		np.savez_compressed(os.path.join(args.out, 'Char_%s.npz' % name), data=data, date=dates,
 			variable=np.array(['RET'] + JKP153), permno=permnos)
 		np.savez(os.path.join(args.out, 'macro_%s.npz' % name), data=mac.reindex(months).values, date=dates,
 			variable=np.array(macro_vars))
 		n = (data[:, :, 0] != UNK).sum(1)
-		meta['splits'][name] = {'first': months[0], 'last': months[-1], 'months': len(months),
+		meta['splits'][name] = {'first': int(months[0]), 'last': int(months[-1]), 'months': len(months),
 			'stocks_total': int(len(permnos)), 'stocks_per_month_median': int(np.median(n))}
 		print(name, meta['splits'][name], file=sys.stderr, flush=True)
+		del data
 	with open(os.path.join(args.out, 'build_meta.json'), 'w') as f:
 		json.dump(meta, f, indent=2)
 
