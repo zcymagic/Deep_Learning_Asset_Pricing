@@ -405,15 +405,19 @@ def ambiguity_sorts(panel, A, M, n_groups=5, min_stocks=10):
 
 
 def fama_macbeth(y, X, mask, names):
-	"""Cross-sectional regressions of y (T x N) on X (T x N x J) each month; NW t-stats of the averages."""
+	"""Cross-sectional regressions of y (T x N) on X (T x N x J) each month; NW t-stats of the averages.
+
+	X may also be a function t -> N x J array, so that large regressor sets are built one month at a time.
+	"""
 	from .audit import nw_tstats
 	T = y.shape[0]
 	coefs = []
 	for t in range(T):
-		m = mask[t] & np.isfinite(y[t]) & np.all(np.isfinite(X[t]), axis=1)
-		if m.sum() < X.shape[2] + 10:
+		Xf = X(t) if callable(X) else X[t]
+		m = mask[t] & np.isfinite(y[t]) & np.all(np.isfinite(Xf), axis=1)
+		if m.sum() < Xf.shape[1] + 10:
 			continue
-		Xt = np.column_stack([np.ones(m.sum()), X[t, m]])
+		Xt = np.column_stack([np.ones(m.sum()), Xf[m]])
 		c, *_ = np.linalg.lstsq(Xt, y[t, m], rcond=None)
 		coefs.append(c)
 	C = np.array(coefs)
@@ -445,12 +449,13 @@ def ambiguity_regressions(panel, A, controls=None, outcome=None, extra_controls=
 	for name, x in (extra_controls or {}).items():
 		cols.append(_standardize_cs(x, panel.mask))
 		names.append(name)
-	Zc = panel.Z[:, :, [panel.char_idx(c) for c in controls]]
-	blocks, cnames = [np.stack(cols, axis=2), Zc], names + list(controls)
-	if squares:
-		blocks.append(Zc ** 2)
-		cnames += [c + '^2' for c in controls]
-	X = np.concatenate(blocks, axis=2)
+	idx = [panel.char_idx(c) for c in controls]
+	cnames = names + list(controls) + ([c + '^2' for c in controls] if squares else [])
+
+	def X(t):		# month t only: the full T x N x J array does not fit in memory for large J
+		Zc = panel.Z[t][:, idx].astype(np.float64)
+		blocks = [np.stack([c[t] for c in cols], axis=1), Zc] + ([Zc ** 2] if squares else [])
+		return np.concatenate(blocks, axis=1)
 	y = panel.R if outcome is None else panel.extra[outcome]
 	return fama_macbeth(y, X, panel.mask, cnames)
 
