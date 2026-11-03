@@ -66,8 +66,8 @@ Two complementary notions are reported:
   with identification of the beta / risk-premium side (CPZ's second network,
   `src/model/model_RtnFcst.py`).
 * **Collinear proxies.** With a priced value factor loading on BEME and a near-duplicate CF2P
-  (correlation 0.95–0.99), the joint value contribution has a lower bound of 0.17, so it is identified.
-  BEME and CF2P individually each have lower bound 0: either can carry all of it. This is the
+  (correlation 0.95–0.99), the joint value contribution has a lower bound of 0.025 at ε = 1%, so it is
+  identified. BEME and CF2P individually each have lower bound 0: either can carry all of it. This is the
   prototype "the data identifies the theme, not the variable" result to look for among the CPZ value,
   profitability and trading-friction clusters.
 * **Mechanical components of ambiguity:**
@@ -77,10 +77,10 @@ Two complementary notions are reported:
      ambiguity "premium" (t = 3.9);
   2. ambiguity is also high for *extreme characteristics*, so with linear characteristic controls it
      absorbs nonlinear characteristic premia. Even with the weight controls, the no-effect synthetic panel
-     still gave t = 3.6. Adding squared characteristics (now the default) brings it to −0.2. On real
+     still gave t = 3.6. Adding squared characteristics (now the default) brings it to 0.6. On real
      data, also try decile-dummy controls and the glass-box shape features themselves;
   3. state-varying shapes extrapolate in extreme states, so the monthly index co-moves with |s_t|
-     (correlation ≈ 0.57 with VIX and with the credit spread in synthetic data). Report the index both
+     (correlation 0.72 with VIX and 0.57 with the credit spread in synthetic data). Report the index both
      raw and residualized on the state variables.
 
 Full pipeline snapshot: `docs/synthetic_validation/paper2_REPORT.md` and `paper2_shape_bands.png`.
