@@ -1,0 +1,9 @@
+# Versions the committed results were produced with (Python 3.13, CPU only).
+# Newer versions should work; stochastic training results can then differ in the last digits.
+torch==2.14.1
+numpy==2.5.3
+pandas==3.0.5
+scipy==1.18.1
+matplotlib==3.11.2
+openpyxl==3.1.5		# reads the Welch-Goyal workbook (osap_build)
+pytest==9.1.1
