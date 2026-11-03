@@ -15,6 +15,7 @@ Steps
 """
 import argparse
 import os
+from types import SimpleNamespace
 import sys
 
 import numpy as np
@@ -51,7 +52,10 @@ def main():
 	state_vars = cfg['state_vars']
 	os.makedirs(args.out, exist_ok=True)
 	names = train.char_names
-	groups = {'value': [c for c in cfg.get('value_group', []) if c in names]} if cfg.get('value_group') else None
+	groups = {'value': [c for c in cfg.get('value_group', []) if c in names]} if cfg.get('value_group') else {}
+	for label, members in cfg.get('feature_groups', {}).items():		# e.g. JKP themes
+		groups[label] = [c for c in members if c in names]
+	groups = groups or None
 
 	# 1. fit
 	rung = args.rung or rc.get('rung', 'additive_state')
@@ -119,7 +123,10 @@ def main():
 		extra_fm[key] = ambiguity_regressions(holdout, A_ho, outcome=key, extra_controls=ctrl)
 		extra_fm[key].to_csv(os.path.join(args.out, 'ambiguity_fm_%s.csv' % key))
 	index_all = np.concatenate([amb['train'][2], amb['valid'][2], amb['test'][2]])
-	full = concat_time([train, valid, test])
+	del holdout, A_ho, w_ho, ctrl
+	# macro series and dates only: concatenating the full panels needs several GB with many characteristics
+	full = SimpleNamespace(macro=np.concatenate([p.macro for p in (train, valid, test)]), macro_names=train.macro_names,
+		dates=np.concatenate([p.dates for p in (train, valid, test)]))
 	idx_macro = ambiguity_index_regressions(full, index_all)
 	idx_macro.to_csv(os.path.join(args.out, 'ambiguity_index_vs_macro.csv'), index=False)
 	pd.DataFrame({'date': full.dates, 'ambiguity_index': index_all}).to_csv(os.path.join(args.out, 'ambiguity_index.csv'), index=False)

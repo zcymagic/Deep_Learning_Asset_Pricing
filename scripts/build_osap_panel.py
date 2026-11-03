@@ -38,11 +38,11 @@ MAPPING = {
 	'r2_1': 'crsp:ret_lag2', 'r12_2': 'crsp:cum_12_2', 'r12_7': 'crsp:cum_12_7', 'r36_13': 'crsp:cum_36_13',
 	'ST_REV': 'crsp:ret_lag1', 'LT_Rev': 'crsp:cum_60_13',
 	# trading frictions
-	'LME': 'crsp:log_me', 'AT': 'osap:AM*ME', 'Beta': 'Beta', 'MktBeta': 'BetaFP', 'IdioVol': 'IdioVol3F',
+	'LME': 'crsp:log_me', 'AT': 'osap:AM*ME', 'MktBeta': 'Beta', 'Beta': 'BetaFP', 'IdioVol': 'IdioVol3F',
 	'Resid_Var': 'IdioVolAHT', 'Variance': 'RealizedVol', 'Spread': 'BidAskSpread', 'Rel2High': 'High52',
 	'LTurnover': 'VolMkt', 'SUV': 'VolumeTrend',
 	# value
-	'A2ME': 'AM', 'BEME': 'BM', 'C': 'Cash', 'CF': 'CF', 'CF2P': 'cfp', 'D2P': 'DivYieldAnn', 'E2P': 'EP',
+	'A2ME': 'AM', 'BEME': 'BM', 'C': 'Cash', 'CF2P': 'CF', 'CF': 'cfp', 'D2P': 'DivYieldAnn', 'E2P': 'EP',
 	'Lev': 'Leverage', 'S2P': 'SP',
 	# profitability
 	'ATO': 'AssetTurnover', 'CTO': 'CapTurnover', 'D2A': 'depr', 'OP': 'OperProf', 'PM': 'PM', 'PROF': 'GP',

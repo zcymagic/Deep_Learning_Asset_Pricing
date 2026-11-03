@@ -1,0 +1,2 @@
+description,t_discovery,t_stepwise,alpha,alpha_when_active,share_active,avg_stocks,t_holdout,alpha_holdout,p_holdout,p_holm,p_maxt,share_active_holdout,t_holdout_stepwise,p_holdout_stepwise,state_dep_var,t_state_dep,class
+bidaskhl_21d > 0.30 AND ret_1_0 > 0.30,-5.76514624844221,-5.775497335446312,-0.03174718449914382,-0.032221023073757904,0.9852941176470589,97.62189054726367,-5.21901011482656,-0.01511833594834983,8.994097022707592e-08,8.994097022707592e-08,0.0,1.0,-5.21901011482656,8.994097022707592e-08,infl,1.8565891608529723,mixed

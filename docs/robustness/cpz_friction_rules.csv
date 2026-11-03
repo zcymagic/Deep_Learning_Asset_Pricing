@@ -1,0 +1,25 @@
+friction_list,model,rule,t_holdout,state_dep_var,t_state_dep,class
+baseline,additive,Rel2High < -0.10 AND ST_REV > 0.30,-2.895378969219175,BAAFFM,3.4910470239767646,mixed
+baseline,additive_state,r12_2 < -0.30 AND ST_REV > 0.30,-7.133026144397312,VXOCLSx,-2.756261364908996,state-dependent
+baseline,additive_state,Rel2High > 0.10 AND Investment > 0.30 AND BAAFFM < 0.23,2.0402274738581525,BAAFFM,-1.8407267910628637,mixed
+baseline,capm,ST_REV > 0.10 AND Rel2High < -0.10,-9.84770755622413,S&P div yield,-1.3969063932431665,mixed
+baseline,ff3,ST_REV > 0.10 AND Rel2High < -0.10,-10.317749541959033,S&P div yield,-2.487460896025184,mixed
+baseline,ff5_umd,Rel2High < -0.10 AND ST_REV > 0.10,-8.46828895152785,S&P div yield,-3.4734379542455223,mixed
+without_Rel2High,additive,Rel2High < -0.10 AND ST_REV > 0.30,-2.895378969219175,BAAFFM,3.4910470239767646,state-dependent
+without_Rel2High,additive_state,r12_2 < -0.30 AND ST_REV > 0.30,-7.133026144397312,VXOCLSx,-2.756261364908996,state-dependent
+without_Rel2High,additive_state,Rel2High > 0.10 AND Investment > 0.30 AND BAAFFM < 0.23,2.0402274738581525,BAAFFM,-1.8407267910628637,state-dependent
+without_Rel2High,capm,ST_REV > 0.10 AND Rel2High < -0.10,-9.84770755622413,S&P div yield,-1.3969063932431665,characteristic
+without_Rel2High,ff3,ST_REV > 0.10 AND Rel2High < -0.10,-10.317749541959033,S&P div yield,-2.487460896025184,characteristic
+without_Rel2High,ff5_umd,Rel2High < -0.10 AND ST_REV > 0.10,-8.46828895152785,S&P div yield,-3.4734379542455223,state-dependent
+narrow_liquidity,additive,Rel2High < -0.10 AND ST_REV > 0.30,-2.895378969219175,BAAFFM,3.4910470239767646,state-dependent
+narrow_liquidity,additive_state,r12_2 < -0.30 AND ST_REV > 0.30,-7.133026144397312,VXOCLSx,-2.756261364908996,state-dependent
+narrow_liquidity,additive_state,Rel2High > 0.10 AND Investment > 0.30 AND BAAFFM < 0.23,2.0402274738581525,BAAFFM,-1.8407267910628637,state-dependent
+narrow_liquidity,capm,ST_REV > 0.10 AND Rel2High < -0.10,-9.84770755622413,S&P div yield,-1.3969063932431665,characteristic
+narrow_liquidity,ff3,ST_REV > 0.10 AND Rel2High < -0.10,-10.317749541959033,S&P div yield,-2.487460896025184,characteristic
+narrow_liquidity,ff5_umd,Rel2High < -0.10 AND ST_REV > 0.10,-8.46828895152785,S&P div yield,-3.4734379542455223,state-dependent
+reversal_as_liquidity,additive,Rel2High < -0.10 AND ST_REV > 0.30,-2.895378969219175,BAAFFM,3.4910470239767646,mixed
+reversal_as_liquidity,additive_state,r12_2 < -0.30 AND ST_REV > 0.30,-7.133026144397312,VXOCLSx,-2.756261364908996,mixed
+reversal_as_liquidity,additive_state,Rel2High > 0.10 AND Investment > 0.30 AND BAAFFM < 0.23,2.0402274738581525,BAAFFM,-1.8407267910628637,mixed
+reversal_as_liquidity,capm,ST_REV > 0.10 AND Rel2High < -0.10,-9.84770755622413,S&P div yield,-1.3969063932431665,limits-to-arbitrage
+reversal_as_liquidity,ff3,ST_REV > 0.10 AND Rel2High < -0.10,-10.317749541959033,S&P div yield,-2.487460896025184,limits-to-arbitrage
+reversal_as_liquidity,ff5_umd,Rel2High < -0.10 AND ST_REV > 0.10,-8.46828895152785,S&P div yield,-3.4734379542455223,mixed

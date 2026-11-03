@@ -24,6 +24,7 @@ class Panel:
 	macro_names: list
 	dates: np.ndarray = None
 	extra: dict = field(default_factory=dict)	# optional T x N arrays (e.g. institutional ownership)
+	state_clip: float = None	# clip standardized state variables to +/- this (None: no clipping)
 
 	@property
 	def T(self):
@@ -47,14 +48,15 @@ class Panel:
 		"""T x P matrix of the named macro state variables."""
 		if not state_vars:
 			return np.zeros((self.T, 0), dtype=np.float32)
-		return self.macro[:, [self.macro_idx(v) for v in state_vars]].astype(np.float32)
+		S = self.macro[:, [self.macro_idx(v) for v in state_vars]].astype(np.float32)
+		return S if self.state_clip is None else np.clip(S, -self.state_clip, self.state_clip)
 
 	def subset_time(self, idx):
 		idx = np.asarray(idx)
 		return Panel(R=self.R[idx], Z=self.Z[idx], mask=self.mask[idx], macro=self.macro[idx],
 			char_names=self.char_names, macro_names=self.macro_names,
 			dates=None if self.dates is None else self.dates[idx],
-			extra={k: v[idx] for k, v in self.extra.items()})
+			extra={k: v[idx] for k, v in self.extra.items()}, state_clip=self.state_clip)
 
 	def to_torch(self, state_vars=(), device='cpu'):
 		return {
@@ -108,6 +110,10 @@ def load_splits(config):
 	train, mu, sd = load_npz_panel(config['individual_feature_file'], config.get('macro_feature_file'), macro_idx)
 	valid, _, _ = load_npz_panel(config['individual_feature_file_valid'], config.get('macro_feature_file_valid'), macro_idx, mu, sd)
 	test, _, _ = load_npz_panel(config['individual_feature_file_test'], config.get('macro_feature_file_test'), macro_idx, mu, sd)
+	# optional clipping of the state variables that scale SDF weights: a state far outside its training range
+	# (svar in October 1987 is 50 training sd) otherwise multiplies the state-varying weights by the same factor
+	for p in (train, valid, test):
+		p.state_clip = config.get('state_clip')
 	return train, valid, test
 
 
@@ -148,4 +154,5 @@ def concat_time(panels):
 		mask=np.concatenate([pad(p.mask, False) for p in panels]),
 		macro=np.concatenate([p.macro for p in panels]),
 		char_names=first.char_names, macro_names=first.macro_names, dates=dates,
-		extra={k: np.concatenate([pad(p.extra[k], np.nan) for p in panels]) for k in extra_keys})
+		extra={k: np.concatenate([pad(p.extra[k], np.nan) for p in panels]) for k in extra_keys},
+		state_clip=first.state_clip)

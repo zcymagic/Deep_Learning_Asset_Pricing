@@ -36,12 +36,14 @@ def screen_pairs(panel, M, top=5, chars=None, controls='market'):
 	"""
 	idx = range(panel.K) if chars is None else [panel.char_idx(c) for c in chars]
 	pairs = list(itertools.combinations(idx, 2))
+	jj = np.array([j for j, _ in pairs], dtype=int)
+	kk = np.array([k for _, k in pairs], dtype=int)
 	X = np.zeros((panel.T, len(pairs)))
 	for t in range(panel.T):
 		m = panel.mask[t]
-		Zt, Rt = panel.Z[t, m], panel.R[t, m]
-		for q, (j, k) in enumerate(pairs):
-			X[t, q] = np.mean(Zt[:, j] * Zt[:, k] * Rt)
+		Zt, Rt = panel.Z[t, m].astype(np.float64), panel.R[t, m].astype(np.float64)
+		C = (Zt * Rt[:, None]).T @ Zt / max(len(Rt), 1)		# C[j, k] = mean_i z_ij z_ik R_i
+		X[t] = C[jj, kk]
 	ctrl = market_control(panel) if controls == 'market' else None
 	tstat, _ = nw_tstats(alpha_moments(X, M, ctrl))
 	order = np.argsort(-np.abs(tstat))[:top]
